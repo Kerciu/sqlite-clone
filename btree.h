@@ -3,4 +3,12 @@
 
 #include <stdbool.h>
 
+// https://www.programiz.com/dsa/b-tree
+
+typedef struct {
+    int* key;
+    bool leaf;
+} TreeNode;
+
+
 #endif
