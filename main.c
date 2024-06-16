@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "inputbuf.h"
+#include "statement.h"
 
 int main(int argc, char* argv[]) {
     InputBuf* input = createInputBuffer();
@@ -12,15 +13,31 @@ int main(int argc, char* argv[]) {
         printPrompt();
         fetchCommand(input);
 
-        if (strcmp(input->buffer, ".exit") == 0) {
-            destroyInputBuffer(input);
-            exit(EXIT_SUCCESS);
+        if (input->buffer[0] == '.')         // Special command recognized
+        {
+            switch (executeSpecialCommand(input)) {
+                case SPECIAL_EXEC_SUCCESS:
+                    continue;
+                case SPECIAL_EXEC_FAILURE:
+                    printf("Failed to recognize special command: %s\n", input->buffer);
+                    continue;
+            }
         }
-        else if(strcmp(input->buffer, ".hello") == 0) {
-            printf("Hello !\n");
+        else
+        {
+        Statement statement;
+        switch (constructStatement(input, &statement)) {
+            case CONSTRUCTION_SUCCESS:
+                break;
+            case CONSTRUCTION_FAILURE_UNRECOGNIZED:
+                fprintf(stderr, "Unrecognized keyword at the end: %s\n", input->buffer);
+                continue;;
         }
-        else {
-            printf("Unrecognized command\n");
+
+        executeStatement(&statement);
+        destroyInputBuffer(input);
         }
     }
+
+    return 0;
 }
