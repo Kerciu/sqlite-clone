@@ -5,8 +5,11 @@
 #include <string.h>
 #include "inputbuf.h"
 
+#define USERNAME_MAX_LENGTH 32
+#define EMAIL_MAX_LENGTH 256
+
 typedef enum {
-    CONSTRUCTION_SUCCESS, CONSTRUCTION_FAILURE_UNRECOGNIZED, CONSTRUCTION_FAILURE
+    CONSTRUCTION_SUCCESS, CONSTRUCTION_FAILURE_UNRECOGNIZED, CONSTRUCTION_FAILURE, CONSTRUCTION_SYNTAX_ERROR
 } StatementStatus;
 
 typedef enum {
@@ -19,7 +22,14 @@ typedef enum {
 
 typedef struct {
     StatementType type;
+    Row rowToInsert;            // Only to use by insert statement
 } Statement;
+
+typedef struct {
+    u_int32_t id;
+    char username[USERNAME_MAX_LENGTH];
+    char* email[EMAIL_MAX_LENGTH];
+} Row;
 
 SpecialCommandStatus executeSpecialCommand(InputBuf* buffer);
 StatementStatus constructStatement(InputBuf* buffer, Statement* statement);
