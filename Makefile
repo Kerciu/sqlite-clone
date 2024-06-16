@@ -1,16 +1,17 @@
 CC = gcc
 CFLAGS = -Wall
 TARGET = kacpersql
-SRCS = main.c
-OBJS = main.o
+SRCS = $(wildcard *.c)
+OBJS = $(SRCS:.c=.o)
+HEADS = $(wildcard *.h)
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS)
 
-$(OBJS): $(SRCS)
-	$(CC) $(CFLAGS) -c $(SRCS)
+%.o: %.c $(HEADS)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJS) $(TARGET)
