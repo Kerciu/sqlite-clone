@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "inputbuf.h"
 #include "statement.h"
+#include "row.h"
 
 int main(int argc, char* argv[]) {
     InputBuf* input = createInputBuffer();
@@ -32,6 +33,9 @@ int main(int argc, char* argv[]) {
             case CONSTRUCTION_FAILURE_UNRECOGNIZED:
                 fprintf(stderr, "Unrecognized keyword at the end: %s\n", input->buffer);
                 continue;;
+            case CONSTRUCTION_FAILURE:
+                fprintf(stderr, "Fatal error while constructing statement\n");
+                exit(1);
         }
 
         executeStatement(&statement);
