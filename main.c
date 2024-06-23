@@ -47,13 +47,16 @@ int main(int argc, char* argv[]) {
             case EXECUTE_SUCCESS:
                 printf("Executed properly :)\n");
                 break;
-            case EXECUTE_TABLE_FAILURE:
-                fprintf(stderr, "Error. Full table, failure occured\n");
+            case EXECUTE_TABLE_FULL:
+                fprintf(stderr, "Error. Full table\n");
+                break;
+            case EXECUTE_FAILURE:
+                fprintf(stderr, "Fatal Error: Execution failure\n");
                 break;
         }
-        destroyInputBuffer(input);
     }
 
+    destroyInputBuffer(input);
     freeTable(table);
     return 0;
 }

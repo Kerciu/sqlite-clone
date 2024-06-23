@@ -19,7 +19,7 @@ typedef enum {
 } SpecialCommandStatus;
 
 typedef enum {
-    EXECUTE_SUCCESS, EXECUTE_TABLE_FAILURE
+    EXECUTE_SUCCESS, EXECUTE_TABLE_FULL, EXECUTE_FAILURE
 } ExecuteStatus;
 
 typedef struct {

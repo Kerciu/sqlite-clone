@@ -40,12 +40,16 @@ ExecuteStatus executeStatement(Statement* statement, Table* table) {
 
         case STATEMENT_SELECT:
             return executeSelect(statement, table);
+
+        default:
+            return EXECUTE_FAILURE;
+
     }
 }
 
 ExecuteStatus executeInsert(Statement* statement, Table* table) {
     if (table->rowNum >= TABLE_MAX_ROWS) {
-        return EXECUTE_TABLE_FAILURE;
+        return EXECUTE_TABLE_FULL;
     }
 
     Row* rowToInsert = &(statement->rowToInsert);
@@ -59,7 +63,12 @@ ExecuteStatus executeInsert(Statement* statement, Table* table) {
 ExecuteStatus executeSelect(Statement* statement, Table* table) {
     Row row;
     for (uint32_t i = 0; i < table->rowNum; ++i) {
-        deserializeRow(reserveRowSlot(table, i), &row);
+        void* rowSlot = reserveRowSlot(table, i);
+        if (rowSlot == NULL) {
+            fprintf(stderr, "Error: Failed to reserve row slot.\n");
+            return EXECUTE_FAILURE;
+        }
+        deserializeRow(rowSlot, &row);
         displayRow(&row);
     }
 
