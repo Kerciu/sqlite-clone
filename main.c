@@ -4,9 +4,12 @@
 #include "row.h"
 
 int main(int argc, char* argv[]) {
+    Table* table = createTable();
     InputBuf* input = createInputBuffer();
-    if (input == NULL) {
-        fprintf(stderr, "Failed to create input buffer..\n");
+    if (input == NULL || table == NULL) {
+        if (table) freeTable(table);
+        if (input) free(input);
+        fprintf(stderr, "Failed to allocate memory..\n");
         return -1;
     }
 
@@ -24,8 +27,7 @@ int main(int argc, char* argv[]) {
                     continue;
             }
         }
-        else
-        {
+
         Statement statement;
         switch (constructStatement(input, &statement)) {
             case CONSTRUCTION_SUCCESS:
@@ -35,13 +37,23 @@ int main(int argc, char* argv[]) {
                 continue;;
             case CONSTRUCTION_FAILURE:
                 fprintf(stderr, "Fatal error while constructing statement\n");
-                exit(1);
+                break;
+            case CONSTRUCTION_SYNTAX_ERROR:
+                fprintf(stderr, "Syntax error. Could not parse statement\n");
+                continue;
         }
 
-        executeStatement(&statement);
-        destroyInputBuffer(input);
+        switch(executeStatement(&statement, table)) {
+            case EXECUTE_SUCCESS:
+                printf("Executed properly :)\n");
+                break;
+            case EXECUTE_TABLE_FAILURE:
+                fprintf(stderr, "Error. Full table, failure occured\n");
+                break;
         }
+        destroyInputBuffer(input);
     }
 
+    freeTable(table);
     return 0;
 }
