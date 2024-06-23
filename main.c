@@ -35,9 +35,12 @@ int main(int argc, char* argv[]) {
             case CONSTRUCTION_FAILURE_UNRECOGNIZED:
                 fprintf(stderr, "Unrecognized keyword at the end: %s\n", input->buffer);
                 continue;;
-            case CONSTRUCTION_FAILURE:
-                fprintf(stderr, "Fatal error while constructing statement\n");
-                break;
+            case CONSTRUCTION_FAILURE_NEGATIVE_ID:
+                fprintf(stderr, "Error: id cannot be negative\n");
+                continue;
+            case CONSTRUCTION_FAILURE_TOO_LONG:
+                fprintf(stderr, "Error: input string is too long");
+                continue;
             case CONSTRUCTION_SYNTAX_ERROR:
                 fprintf(stderr, "Syntax error. Could not parse statement\n");
                 continue;
