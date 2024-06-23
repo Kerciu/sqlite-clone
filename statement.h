@@ -18,6 +18,10 @@ typedef enum {
     SPECIAL_EXEC_SUCCESS, SPECIAL_EXEC_FAILURE
 } SpecialCommandStatus;
 
+typedef enum {
+    EXECUTE_SUCCESS, EXECUTE_TABLE_FAILURE
+} ExecuteStatus;
+
 typedef struct {
     StatementType type;
     Row rowToInsert;            // Only to use by insert statement
@@ -25,6 +29,8 @@ typedef struct {
 
 SpecialCommandStatus executeSpecialCommand(InputBuf* buffer);
 StatementStatus constructStatement(InputBuf* buffer, Statement* statement);
-void executeStatement(Statement* statement);
+ExecuteStatus executeStatement(Statement* statement, Table* table);
+ExecuteStatus executeInsert(Statement* statement, Table* table);
+ExecuteStatus executeSelect(Statement* statement, Table* table);
 
 #endif
