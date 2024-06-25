@@ -14,11 +14,18 @@
 #include <errno.h>
 #include <stdint.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #define sizeOFAttribute(Struct, Attribute) sizeof(((Struct*)0)->Attribute)
 #define USERNAME_MAX_LENGTH 32
 #define EMAIL_MAX_LENGTH 256
 #define TABLE_MAX_PAGES 100
+
+typedef struct {
+    int fileDescriptor;
+    uint32_t fileLength;
+    void* pages[TABLE_MAX_PAGES];
+} Pager;
 
 typedef struct {
     uint32_t rowNum;
@@ -30,12 +37,6 @@ typedef struct {
     char username[USERNAME_MAX_LENGTH + 1];
     char email[EMAIL_MAX_LENGTH + 1];
 } Row;
-
-typedef struct {
-    int fileDescriptor;
-    uint32_t fileLength;
-    void* pages[TABLE_MAX_PAGES];
-} Pager;
 
 extern const uint32_t ID_SIZE;
 extern const uint32_t USERNAME_SIZE;
@@ -53,9 +54,10 @@ void serializeRow(Row* source, void* destination);
 void deserializeRow(void* source, Row* destination);
 void* reserveRowSlot(Table* table, uint32_t rowNum);
 
-Table* createTable(void);
 Table* openDataBase(const char* fileHandle);
 void closeDataBase(Table* table);
+
+void* getPage(Pager* pager, uint32_t pageNum);
 void pagerFlush(Pager* pager, uint32_t pageNum, uint32_t size);
 Pager* openPager(const char* fileHandle);
 void displayRow(Row* row);

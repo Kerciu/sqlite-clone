@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
 
     InputBuf* input = createInputBuffer();
     if (input == NULL || table == NULL) {
-        if (table) freeTable(table);
+        if (table) closeDataBase(table);
         if (input) free(input);
         fprintf(stderr, "Failed to allocate memory..\n");
         return -1;
@@ -67,6 +67,6 @@ int main(int argc, char* argv[]) {
     }
 
     destroyInputBuffer(input);
-    freeTable(table);
+    closeDataBase(table);
     return 0;
 }
