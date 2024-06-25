@@ -32,27 +32,55 @@ void deserializeRow(void* source, Row* destination)
 void* reserveRowSlot(Table *table, uint32_t rowNum)
 {
     uint32_t pageNum = rowNum / ROWS_PER_PAGE;
-    void* page = table->pages[pageNum];
-    if (page == NULL) {
-        page = table->pages[pageNum] = malloc(PAGE_SIZE);
-    }
+    void* page = getPage(table->pager, pageNum);
     uint32_t rowOffset = rowNum % ROWS_PER_PAGE;
     uint32_t byteOffset = rowOffset * ROW_SIZE;
 
     return page + byteOffset;
 }
 
-Table* createTable(void) {
+void* getPage(PageSorter* pager, uint32_t pageNum) {
+    if (pageNum > TABLE_MAX_PAGES) {
+        fprintf(stderr, "Unable to fetch page number in bounds (%d > %d)\n", pageNum, TABLE_MAX_PAGES);
+        exit(EXIT_FAILURE);
+    }
+
+    if (pager->pages[pageNum] == NULL) {        // Cache miss
+        // Allocate memory and load from file
+        void* page = malloc(PAGE_SIZE);
+        uint32_t numOfPages = pager->fileLength / PAGE_SIZE;
+
+        // Save partial page at the end of file
+        if (pager->fileLength % PAGE_SIZE) {
+            ++numOfPages;
+        }
+
+        if (pageNum <= numOfPages) {
+            lseek(pager->fileDescriptor, pageNum * PAGE_SIZE, SEEK_SET);
+            ssize_t bytesRead = read(pager->fileDescriptor, page, PAGE_SIZE);
+
+            if (bytesRead == -1) {
+                fprintf(stderr, "Failed to read file: %d\n", errno);
+                exit(EXIT_FAILURE);
+            }
+        }
+        pager->pages[pageNum] = page;
+    }
+
+    return pager->pages[pageNum];
+}
+
+Table* openDataBase(const char* fileHandle) {
     Table* table = (Table*)malloc(sizeof(Table));
     if (table == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
         return NULL;
     }
+    PageSorter* pager = openPager(fileHandle);
+    uint32_t numRows = pager->fileLength / ROW_SIZE;
 
-    table->rowNum = 0;
-    for (uint32_t i =0; i< TABLE_MAX_PAGES; ++i) {
-        table->pages[i] = NULL;
-    }
+    table->rowNum = numRows;
+    table->pager = pager;
 
     return table;
 }
@@ -69,4 +97,24 @@ void freeTable(Table* table) {
 
 void displayRow(Row* row) {
     printf("(%d %s %s)\n", row->id, row->username, row->email);
+}
+
+PageSorter* openPager(const char* fileHandle) {
+    int fileDescript = open(fileHandle, O_RDWR | O_CREAT, S_IWUSR | S_IRUSR);
+    if (fileDescript == -1) {
+        fprintf(stderr, "Unable to open file\n");
+        exit(EXIT_FAILURE);
+    }
+
+    off_t fileLen = lseek(fileDescript, 0, SEEK_END);
+
+    PageSorter* pager = (PageSorter*)malloc(sizeof(PageSorter));
+    pager->fileDescriptor = fileDescript;
+    pager->fileLength = fileLen;
+
+    for (uint32_t i = 0; i < TABLE_MAX_PAGES; ++i) {
+        pager->pages[i] = NULL;
+    }
+
+    return pager;
 }

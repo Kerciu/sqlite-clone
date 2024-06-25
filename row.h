@@ -9,25 +9,33 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>
+#include <errno.h>
 #include <stdint.h>
+#include <fcntl.h>
 
 #define sizeOFAttribute(Struct, Attribute) sizeof(((Struct*)0)->Attribute)
-
 #define USERNAME_MAX_LENGTH 32
 #define EMAIL_MAX_LENGTH 256
 #define TABLE_MAX_PAGES 100
 
 typedef struct {
     uint32_t rowNum;
-    void* pages[TABLE_MAX_PAGES];
+    PageSorter* pager;
 } Table;
 
 typedef struct {
     uint32_t id;
-    char username[USERNAME_MAX_LENGTH];
-    char email[EMAIL_MAX_LENGTH];
+    char username[USERNAME_MAX_LENGTH + 1];
+    char email[EMAIL_MAX_LENGTH + 1];
 } Row;
+
+typedef struct {
+    int fileDescriptor;
+    uint32_t fileLength;
+    void* pages[TABLE_MAX_PAGES];
+} PageSorter;
 
 extern const uint32_t ID_SIZE;
 extern const uint32_t USERNAME_SIZE;
