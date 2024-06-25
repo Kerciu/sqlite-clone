@@ -1,11 +1,12 @@
 #include "statement.h"
 
-SpecialCommandStatus executeSpecialCommand(InputBuf* buffer) {
+SpecialCommandStatus executeSpecialCommand(InputBuf* buffer, Table* table) {
 
     if (buffer->buffer == NULL)
         return SPECIAL_EXEC_FAILURE;
 
     if (strcmp(buffer->buffer, ".exit") == 0) {
+        closeDataBase(table);
         exit(EXIT_SUCCESS);
     }
 

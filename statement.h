@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "inputbuf.h"
-#include "row.h"
+#include "pager.h"
 
 typedef enum {
     CONSTRUCTION_SUCCESS, CONSTRUCTION_FAILURE_UNRECOGNIZED, CONSTRUCTION_FAILURE_NEGATIVE_ID,
@@ -28,7 +28,7 @@ typedef struct {
     Row rowToInsert;            // Only to use by insert statement
 } Statement;
 
-SpecialCommandStatus executeSpecialCommand(InputBuf* buffer);
+SpecialCommandStatus executeSpecialCommand(InputBuf* buffer, Table* table);
 StatementStatus constructStatement(InputBuf* buffer, Statement* statement);
 ExecuteStatus executeStatement(Statement* statement, Table* table);
 ExecuteStatus executeInsert(Statement* statement, Table* table);

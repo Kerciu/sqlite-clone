@@ -1,4 +1,4 @@
-#include "row.h"
+#include "pager.h"
 
 const uint32_t ID_SIZE = sizeOFAttribute(Row, id);
 const uint32_t USERNAME_SIZE = sizeOFAttribute(Row, username);
@@ -39,7 +39,7 @@ void* reserveRowSlot(Table *table, uint32_t rowNum)
     return page + byteOffset;
 }
 
-void* getPage(PageSorter* pager, uint32_t pageNum) {
+void* getPage(Pager* pager, uint32_t pageNum) {
     if (pageNum > TABLE_MAX_PAGES) {
         fprintf(stderr, "Unable to fetch page number in bounds (%d > %d)\n", pageNum, TABLE_MAX_PAGES);
         exit(EXIT_FAILURE);
@@ -76,7 +76,7 @@ Table* openDataBase(const char* fileHandle) {
         fprintf(stderr, "Memory allocation failed\n");
         return NULL;
     }
-    PageSorter* pager = openPager(fileHandle);
+    Pager* pager = openPager(fileHandle);
     uint32_t numRows = pager->fileLength / ROW_SIZE;
 
     table->rowNum = numRows;
@@ -85,21 +85,75 @@ Table* openDataBase(const char* fileHandle) {
     return table;
 }
 
-void freeTable(Table* table) {
-    if (table == NULL) return;
+void closeDataBase(Table* table) {
+    // Flushes the page cache to disk
+    // Closes the database file
+    // Frees memory from Pager and Table structs
 
-    for (uint32_t i = 0; table->pages[i]; ++i) {
-        free(table->pages[i]);
+    Pager* pager = table->pager;
+    uint32_t fullPageNum = table->rowNum / ROWS_PER_PAGE;
+
+    for (uint32_t i = 0; i < fullPageNum; ++i) {
+        if (pager->pages[i] == NULL) continue;
+
+        pagerFlush(pager, i, PAGE_SIZE);
+        free(pager->pages[i]);
+        pager->pages[i] = NULL;
     }
 
+    // There might be partial page to write at the end of file
+    uint32_t additionalsRowsNum = table->rowNum % ROWS_PER_PAGE;
+    if (additionalsRowsNum > 0) {
+        uint32_t pageNum = fullPageNum;
+
+        if (pager->pages[pageNum] != NULL) {
+            pagerFlush(pager, pageNum, additionalsRowsNum * ROW_SIZE);
+            free(pager->pages[pageNum]);
+        }
+    }
+
+    int result = close(pager->fileDescriptor);
+    if (result == -1) {
+        fprintf(stderr, "Error while closing database file\n");
+        exit(EXIT_FAILURE);
+    }
+
+    for (uint32_t i = 0; i < TABLE_MAX_PAGES; ++i) {
+        void * page = pager->pages[i];
+        if (page) {
+            free(page);
+            pager->pages[i] = NULL;
+        }
+    }
+
+    free(pager);
     free(table);
+}
+
+void pagerFlush(Pager* pager, uint32_t pageNum, uint32_t size) {
+    if (pager->pages[pageNum] == NULL) {
+        fprintf(stderr, "Error: trying to flush NULL page\n");
+        exit(EXIT_FAILURE);
+    }
+
+    off_t offset = lseek(pager->fileDescriptor, pageNum * PAGE_SIZE, SEEK_SET);
+    if (offset == -1) {
+        fprintf(stderr, "Error occured while seeking %d\n", errno);
+        exit(EXIT_FAILURE);
+    }
+
+    ssize_t bytesWritten = write(pager->fileDescriptor, pager->pages[pageNum], size);
+    if (bytesWritten == -1) {
+        fprintf(stderr, "Error occured while writing: %d\n", errno);
+        exit(EXIT_FAILURE);
+    }
 }
 
 void displayRow(Row* row) {
     printf("(%d %s %s)\n", row->id, row->username, row->email);
 }
 
-PageSorter* openPager(const char* fileHandle) {
+Pager* openPager(const char* fileHandle) {
     int fileDescript = open(fileHandle, O_RDWR | O_CREAT, S_IWUSR | S_IRUSR);
     if (fileDescript == -1) {
         fprintf(stderr, "Unable to open file\n");
@@ -108,7 +162,7 @@ PageSorter* openPager(const char* fileHandle) {
 
     off_t fileLen = lseek(fileDescript, 0, SEEK_END);
 
-    PageSorter* pager = (PageSorter*)malloc(sizeof(PageSorter));
+    Pager* pager = (Pager*)malloc(sizeof(Pager));
     pager->fileDescriptor = fileDescript;
     pager->fileLength = fileLen;
 

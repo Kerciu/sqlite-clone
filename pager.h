@@ -22,7 +22,7 @@
 
 typedef struct {
     uint32_t rowNum;
-    PageSorter* pager;
+    Pager* pager;
 } Table;
 
 typedef struct {
@@ -35,7 +35,7 @@ typedef struct {
     int fileDescriptor;
     uint32_t fileLength;
     void* pages[TABLE_MAX_PAGES];
-} PageSorter;
+} Pager;
 
 extern const uint32_t ID_SIZE;
 extern const uint32_t USERNAME_SIZE;
@@ -54,8 +54,10 @@ void deserializeRow(void* source, Row* destination);
 void* reserveRowSlot(Table* table, uint32_t rowNum);
 
 Table* createTable(void);
-void freeTable(Table* table);
-
+Table* openDataBase(const char* fileHandle);
+void closeDataBase(Table* table);
+void pagerFlush(Pager* pager, uint32_t pageNum, uint32_t size);
+Pager* openPager(const char* fileHandle);
 void displayRow(Row* row);
 
 #endif

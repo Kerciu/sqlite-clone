@@ -1,10 +1,17 @@
 #include <stdio.h>
 #include "inputbuf.h"
 #include "statement.h"
-#include "row.h"
+#include "pager.h"
 
 int main(int argc, char* argv[]) {
-    Table* table = createTable();
+    if (argc < 2) {
+        fprintf(stderr, "You must enter a file name!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char* fileHandle = argv[1];
+    Table* table = openDataBase(fileHandle);
+
     InputBuf* input = createInputBuffer();
     if (input == NULL || table == NULL) {
         if (table) freeTable(table);
@@ -19,7 +26,7 @@ int main(int argc, char* argv[]) {
 
         if (input->buffer[0] == '.')         // Special command recognized
         {
-            switch (executeSpecialCommand(input)) {
+            switch (executeSpecialCommand(input, table)) {
                 case SPECIAL_EXEC_SUCCESS:
                     continue;
                 case SPECIAL_EXEC_FAILURE:
