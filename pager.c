@@ -25,16 +25,6 @@ void deserializeRow(void* source, Row* destination)
     memcpy(&(destination->email), source + EMAIL_OFFSET, EMAIL_SIZE);
 }
 
-void* reserveRowSlot(Table *table, uint32_t rowNum)
-{
-    uint32_t pageNum = rowNum / ROWS_PER_PAGE;
-    void* page = getPage(table->pager, pageNum);
-    uint32_t rowOffset = rowNum % ROWS_PER_PAGE;
-    uint32_t byteOffset = rowOffset * ROW_SIZE;
-
-    return page + byteOffset;
-}
-
 void* getPage(Pager* pager, uint32_t pageNum) {
     if (pageNum > TABLE_MAX_PAGES) {
         fprintf(stderr, "Unable to fetch page number in bounds (%d > %d)\n", pageNum, TABLE_MAX_PAGES);
@@ -75,7 +65,7 @@ Table* openDataBase(const char* fileHandle) {
     Pager* pager = openPager(fileHandle);
     uint32_t numRows = pager->fileLength / ROW_SIZE;
 
-    table->rowNum = numRows;
+    table->numRows = numRows;
     table->pager = pager;
 
     return table;
@@ -87,7 +77,7 @@ void closeDataBase(Table* table) {
     // Frees memory from Pager and Table structs
 
     Pager* pager = table->pager;
-    uint32_t fullPageNum = table->rowNum / ROWS_PER_PAGE;
+    uint32_t fullPageNum = table->numRows / ROWS_PER_PAGE;
 
     for (uint32_t i = 0; i < fullPageNum; ++i) {
         if (pager->pages[i] == NULL) continue;
@@ -98,7 +88,7 @@ void closeDataBase(Table* table) {
     }
 
     // There might be partial page to write at the end of file
-    uint32_t additionalsRowsNum = table->rowNum % ROWS_PER_PAGE;
+    uint32_t additionalsRowsNum = table->numRows % ROWS_PER_PAGE;
     if (additionalsRowsNum > 0) {
         uint32_t pageNum = fullPageNum;
 
@@ -174,7 +164,7 @@ Cursor *tableStart(Table *table)
     Cursor* startCursor = (Cursor*)malloc(sizeof(Cursor));
     startCursor->table = table;
     startCursor->rowNum = 0;
-    startCursor->endOfTable = (table->rowNum == 0);
+    startCursor->endOfTable = (table->numRows == 0);
 
     return startCursor;
 }
@@ -183,8 +173,25 @@ Cursor *tableEnd(Table *table)
 {
     Cursor* endCursor = (Cursor*)malloc(sizeof(Cursor));
     endCursor->table = table;
-    endCursor->rowNum = table->rowNum;
+    endCursor->rowNum = table->numRows;
     endCursor->endOfTable = true;
 
     return endCursor;
+}
+
+void* cursorValue(Cursor* cursor)
+{
+    uint32_t pageNum = cursor->rowNum / ROWS_PER_PAGE;
+    void* page = getPage(cursor->table->pager, pageNum);
+    uint32_t rowOffset = cursor->rowNum % ROWS_PER_PAGE;
+    uint32_t byteOffset = rowOffset * ROW_SIZE;
+
+    return page + byteOffset;
+}
+
+void cursorAdvance(Cursor* cursor) {
+    ++(cursor->rowNum);
+    if (cursor->rowNum >= cursor->table->numRows) {
+        cursor->endOfTable = true;
+    }
 }

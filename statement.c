@@ -83,29 +83,32 @@ ExecuteStatus executeStatement(Statement* statement, Table* table) {
 }
 
 ExecuteStatus executeInsert(Statement* statement, Table* table) {
-    if (table->rowNum >= TABLE_MAX_ROWS) {
+    if (table->numRows >= TABLE_MAX_ROWS) {
         return EXECUTE_TABLE_FULL;
     }
 
     Row* rowToInsert = &(statement->rowToInsert);
-    serializeRow(rowToInsert, reserveRowSlot(table, table->rowNum));
-    ++(table->rowNum);
+    Cursor* cursor = tableEnd(table);
+    serializeRow(rowToInsert, cursorValue(cursor));
+    ++(table->numRows);
+
+    free(cursor);
 
     return EXECUTE_SUCCESS;
 
 }
 
 ExecuteStatus executeSelect(Statement* statement, Table* table) {
+    Cursor* cursor = tableStart(table);
+
     Row row;
-    for (uint32_t i = 0; i < table->rowNum; ++i) {
-        void* rowSlot = reserveRowSlot(table, i);
-        if (rowSlot == NULL) {
-            fprintf(stderr, "Error: Failed to reserve row slot.\n");
-            return EXECUTE_FAILURE;
-        }
-        deserializeRow(rowSlot, &row);
+    while (!cursor->endOfTable) {
+        deserializeRow(cursorValue(cursor), &row);
         displayRow(&row);
+        cursorAdvance(cursor);
     }
+
+    free(cursor);
 
     return EXECUTE_SUCCESS;
 }

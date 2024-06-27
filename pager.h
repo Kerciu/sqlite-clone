@@ -40,7 +40,7 @@ typedef struct {
 } Pager;
 
 typedef struct {
-    uint32_t rowNum;
+    uint32_t numRows;
     Pager* pager;
 } Table;
 
@@ -59,11 +59,11 @@ typedef struct {
 
 void serializeRow(Row* source, void* destination);
 void deserializeRow(void* source, Row* destination);
-void* reserveRowSlot(Table* table, uint32_t rowNum);
+void* cursorValue(Cursor* cursor);
+void cursorAdvance(Cursor* cursor);
 
 Table* openDataBase(const char* fileHandle);
 void closeDataBase(Table* table);
-
 void* getPage(Pager* pager, uint32_t pageNum);
 void pagerFlush(Pager* pager, uint32_t pageNum, uint32_t size);
 Pager* openPager(const char* fileHandle);
