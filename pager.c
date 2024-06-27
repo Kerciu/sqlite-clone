@@ -168,3 +168,23 @@ Pager* openPager(const char* fileHandle) {
 
     return pager;
 }
+
+Cursor *tableStart(Table *table)
+{
+    Cursor* startCursor = (Cursor*)malloc(sizeof(Cursor));
+    startCursor->table = table;
+    startCursor->rowNum = 0;
+    startCursor->endOfTable = (table->rowNum == 0);
+
+    return startCursor;
+}
+
+Cursor *tableEnd(Table *table)
+{
+    Cursor* endCursor = (Cursor*)malloc(sizeof(Cursor));
+    endCursor->table = table;
+    endCursor->rowNum = table->rowNum;
+    endCursor->endOfTable = true;
+
+    return endCursor;
+}
