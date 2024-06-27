@@ -81,5 +81,6 @@ Cursor* tableStart(Table* table);
 Cursor* tableEnd(Table* table);
 
 void displayRow(Row* row);
+void printConstants(void);
 
 #endif

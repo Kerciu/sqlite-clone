@@ -16,5 +16,6 @@ uint32_t* leafNodeKey(void* node, uint32_t cellNum);
 void* leafNodeValue(void* node, uint32_t cellNum);
 void initializeLeafNode(void* node);
 void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value);
+void printLeafNode(void* node);
 
 #endif

@@ -10,6 +10,18 @@ SpecialCommandStatus executeSpecialCommand(InputBuf* buffer, Table* table) {
         exit(EXIT_SUCCESS);
     }
 
+    else if (strcmp(buffer->buffer, ".constants") == 0) {
+        printf("Constants:\n");
+        printConstants();
+        return SPECIAL_EXEC_SUCCESS;
+    }
+
+    else if (strcmp(buffer->buffer, ".btree") == 0) {
+        printf("B-Tree:\n");
+        printLeafNode(getPage(table->pager, 0));
+        return SPECIAL_EXEC_SUCCESS;
+    }
+
     else return SPECIAL_EXEC_FAILURE;
 }
 

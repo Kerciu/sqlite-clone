@@ -46,3 +46,13 @@ void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value) {
     *(leafNodeKey(node, cursor->cellNum)) = key;
     serializeRow(value, leafNodeValue(node, cursor->cellNum));
 }
+
+void printLeafNode(void* node) {
+    uint32_t numCells = *leafNodeNumCells(node);
+    printf("leaf (size %d)\n", numCells);
+
+    for (uint32_t i =0; i< numCells; ++i) {
+        uint32_t key = *leafNodeKey(node, i);
+        printf("  - %d : %d\n", i, key);
+    }
+}
