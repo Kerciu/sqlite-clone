@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -37,6 +38,13 @@ typedef struct {
     char username[USERNAME_MAX_LENGTH + 1];
     char email[EMAIL_MAX_LENGTH + 1];
 } Row;
+
+typedef struct {
+    // represents location in a table
+    Table* table;
+    uint32_t rowNum;
+    bool endOfTable;
+} Cursor;
 
 extern const uint32_t ID_SIZE;
 extern const uint32_t USERNAME_SIZE;

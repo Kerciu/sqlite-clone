@@ -20,10 +20,6 @@ void serializeRow(Row *source, void *destination)
 
 void deserializeRow(void* source, Row* destination)
 {
-    if (source == NULL || destination == NULL) {
-        fprintf(stderr, "Error: NULL pointer in deserializeRow.\n");
-        return;
-    }
     memcpy(&(destination->id), source + ID_OFFSET, ID_SIZE);
     memcpy(&(destination->username), source + USERNAME_OFFSET, USERNAME_SIZE);
     memcpy(&(destination->email), source + EMAIL_OFFSET, EMAIL_SIZE);
