@@ -7,7 +7,7 @@ uint32_t *leafNodeNumCells(void *node)
 
 void *leafNodeCell(void *node, uint32_t cellNum)
 {
-    return node + LEAF_NODE_HEADER_SIZE + cellNum * LEAF_NODE_HEADER_SIZE;
+    return node + LEAF_NODE_HEADER_SIZE + cellNum * LEAF_NODE_CELL_SIZE;
 }
 
 uint32_t *leafNodeKey(void *node, uint32_t cellNum)
