@@ -1,4 +1,4 @@
-#include "pager.h"
+#include "database.h"
 
 const uint32_t ID_SIZE = sizeOFAttribute(Row, id);
 const uint32_t USERNAME_SIZE = sizeOFAttribute(Row, username);
@@ -51,6 +51,10 @@ void* getPage(Pager* pager, uint32_t pageNum) {
             }
         }
         pager->pages[pageNum] = page;
+
+        if (pageNum >= pager->numPages) {
+            pager->numPages = pageNum + 1;
+        }
     }
 
     return pager->pages[pageNum];
@@ -77,25 +81,13 @@ void closeDataBase(Table* table) {
     // Frees memory from Pager and Table structs
 
     Pager* pager = table->pager;
-    uint32_t fullPageNum = table->numRows / ROWS_PER_PAGE;
 
-    for (uint32_t i = 0; i < fullPageNum; ++i) {
+    for (uint32_t i = 0; i < pager->numPages; ++i) {
         if (pager->pages[i] == NULL) continue;
 
-        pagerFlush(pager, i, PAGE_SIZE);
+        pagerFlush(pager, i);
         free(pager->pages[i]);
         pager->pages[i] = NULL;
-    }
-
-    // There might be partial page to write at the end of file
-    uint32_t additionalsRowsNum = table->numRows % ROWS_PER_PAGE;
-    if (additionalsRowsNum > 0) {
-        uint32_t pageNum = fullPageNum;
-
-        if (pager->pages[pageNum] != NULL) {
-            pagerFlush(pager, pageNum, additionalsRowsNum * ROW_SIZE);
-            free(pager->pages[pageNum]);
-        }
     }
 
     int result = close(pager->fileDescriptor);
@@ -116,7 +108,7 @@ void closeDataBase(Table* table) {
     free(table);
 }
 
-void pagerFlush(Pager* pager, uint32_t pageNum, uint32_t size) {
+void pagerFlush(Pager* pager, uint32_t pageNum) {
     if (pager->pages[pageNum] == NULL) {
         fprintf(stderr, "Error: trying to flush NULL page\n");
         exit(EXIT_FAILURE);
@@ -128,7 +120,7 @@ void pagerFlush(Pager* pager, uint32_t pageNum, uint32_t size) {
         exit(EXIT_FAILURE);
     }
 
-    ssize_t bytesWritten = write(pager->fileDescriptor, pager->pages[pageNum], size);
+    ssize_t bytesWritten = write(pager->fileDescriptor, pager->pages[pageNum], PAGE_SIZE);
     if (bytesWritten == -1) {
         fprintf(stderr, "Error occured while writing: %d\n", errno);
         exit(EXIT_FAILURE);
@@ -151,6 +143,12 @@ Pager* openPager(const char* fileHandle) {
     Pager* pager = (Pager*)malloc(sizeof(Pager));
     pager->fileDescriptor = fileDescript;
     pager->fileLength = fileLen;
+    pager->numPages = (fileLen / PAGE_SIZE);
+
+    if (fileLen % PAGE_SIZE != 0) {
+        fprintf(stderr, "Data base file is not a whole number of pages. Corrunt file\n");
+        exit(EXIT_FAILURE);
+    }
 
     for (uint32_t i = 0; i < TABLE_MAX_PAGES; ++i) {
         pager->pages[i] = NULL;
@@ -163,8 +161,12 @@ Cursor *tableStart(Table *table)
 {
     Cursor* startCursor = (Cursor*)malloc(sizeof(Cursor));
     startCursor->table = table;
-    startCursor->rowNum = 0;
-    startCursor->endOfTable = (table->numRows == 0);
+    startCursor->pageNum = table->rootPageNum;
+    startCursor->cellNum = 0;
+
+    void* rootNode = getPage(table->pager, table->rootPageNum);
+    uint32_t numCells = *leafNodeNumCells(rootNode);
+    startCursor->endOfTable = (numCells == 0);
 
     return startCursor;
 }
@@ -173,7 +175,10 @@ Cursor *tableEnd(Table *table)
 {
     Cursor* endCursor = (Cursor*)malloc(sizeof(Cursor));
     endCursor->table = table;
-    endCursor->rowNum = table->numRows;
+    endCursor->pageNum = table->rootPageNum;
+
+    void* rootNode = getPage(table->pager, table->rootPageNum);
+    uint32_t numCells = *leafNodeNumCells(rootNode);
     endCursor->endOfTable = true;
 
     return endCursor;
@@ -181,17 +186,18 @@ Cursor *tableEnd(Table *table)
 
 void* cursorValue(Cursor* cursor)
 {
-    uint32_t pageNum = cursor->rowNum / ROWS_PER_PAGE;
+    uint32_t pageNum = cursor->pageNum;
     void* page = getPage(cursor->table->pager, pageNum);
-    uint32_t rowOffset = cursor->rowNum % ROWS_PER_PAGE;
-    uint32_t byteOffset = rowOffset * ROW_SIZE;
 
-    return page + byteOffset;
+    return leafNodeValue(page, cursor->cellNum);
 }
 
 void cursorAdvance(Cursor* cursor) {
-    ++(cursor->rowNum);
-    if (cursor->rowNum >= cursor->table->numRows) {
+    uint32_t pageNum = cursor->pageNum;
+    void* node = getPage(cursor->table->pager, pageNum);
+
+    ++(cursor->cellNum);
+    if (cursor->cellNum >= (*leafNodeNumCells(node))) {
         cursor->endOfTable = true;
     }
 }

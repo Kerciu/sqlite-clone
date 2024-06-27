@@ -1,5 +1,5 @@
-#ifndef DATABASE_ROW
-#define DATABASE_ROW
+#ifndef DATABASE
+#define DATABASE
 
 /*
     For now I will store data in pages
@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "btree.h"
 
 #define sizeOFAttribute(Struct, Attribute) sizeof(((Struct*)0)->Attribute)
 #define USERNAME_MAX_LENGTH 32
@@ -30,17 +31,16 @@ extern const uint32_t USERNAME_OFFSET;
 extern const uint32_t EMAIL_OFFSET;
 extern const uint32_t ROW_SIZE;
 extern const uint32_t PAGE_SIZE;
-extern const uint32_t ROWS_PER_PAGE;
-extern const uint32_t TABLE_MAX_ROWS;
 
 typedef struct {
     int fileDescriptor;
     uint32_t fileLength;
+    uint32_t numPages;
     void* pages[TABLE_MAX_PAGES];
 } Pager;
 
 typedef struct {
-    uint32_t numRows;
+    uint32_t rootPageNum;
     Pager* pager;
 } Table;
 
@@ -53,7 +53,8 @@ typedef struct {
 typedef struct {
     // represents location in a table
     Table* table;
-    uint32_t rowNum;
+    uint32_t pageNum;
+    uint32_t cellNum;
     bool endOfTable;    // indicates position one past the last elem
 } Cursor;
 
@@ -65,7 +66,7 @@ void cursorAdvance(Cursor* cursor);
 Table* openDataBase(const char* fileHandle);
 void closeDataBase(Table* table);
 void* getPage(Pager* pager, uint32_t pageNum);
-void pagerFlush(Pager* pager, uint32_t pageNum, uint32_t size);
+void pagerFlush(Pager* pager, uint32_t pageNum);
 Pager* openPager(const char* fileHandle);
 
 Cursor* tableStart(Table* table);
