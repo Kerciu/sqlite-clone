@@ -16,12 +16,8 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "btree.h"
-
-#define sizeOFAttribute(Struct, Attribute) sizeof(((Struct*)0)->Attribute)
-#define USERNAME_MAX_LENGTH 32
-#define EMAIL_MAX_LENGTH 256
-#define TABLE_MAX_PAGES 100
+#include "types.h"
+#include "node.h"
 
 extern const uint32_t ID_SIZE;
 extern const uint32_t USERNAME_SIZE;
@@ -32,6 +28,32 @@ extern const uint32_t EMAIL_OFFSET;
 extern const uint32_t ROW_SIZE;
 extern const uint32_t PAGE_SIZE;
 
+/* Node Header Format*/
+typedef enum { NODE_INTERNAL, NODE_LEAF } NodeType;
+
+extern const uint32_t NODE_TYPE_SIZE;
+extern const uint32_t NODE_TYPE_OFFSET;
+extern const uint32_t IS_ROOT_SIZE;
+extern const uint32_t IS_ROOT_OFFSET;
+extern const uint32_t PARENT_POINTER_SIZE;
+extern const uint32_t PARENT_POINTER_OFFSET;
+extern const uint8_t COMMON_NODE_HEADER_SIZE;
+
+/* Leaf Node Header Layout */
+extern const uint32_t LEAF_NODE_NUM_CELLS_SIZE;
+extern const uint32_t LEAF_NODE_NUM_CELLS_OFFSET;
+extern const uint32_t LEAF_NODE_HEADER_SIZE;
+
+/* Leaf Node Body Layout*/
+extern const uint32_t LEAF_NODE_KEY_SIZE;
+extern const uint32_t LEAF_NODE_KEY_OFFSET;
+extern const uint32_t LEAF_NODE_VALUE_SIZE;
+extern const uint32_t LEAF_NODE_VALUE_OFFSET;
+
+extern const uint32_t LEAF_NODE_CELL_SIZE;
+extern const uint32_t LEAF_NODE_SPACE_FOR_CELLS;
+extern const uint32_t LEAF_NODE_MAX_CELLS;
+
 typedef struct {
     int fileDescriptor;
     uint32_t fileLength;
@@ -39,24 +61,10 @@ typedef struct {
     void* pages[TABLE_MAX_PAGES];
 } Pager;
 
-typedef struct {
+struct Table {
     uint32_t rootPageNum;
     Pager* pager;
-} Table;
-
-typedef struct {
-    uint32_t id;
-    char username[USERNAME_MAX_LENGTH + 1];
-    char email[EMAIL_MAX_LENGTH + 1];
-} Row;
-
-typedef struct {
-    // represents location in a table
-    Table* table;
-    uint32_t pageNum;
-    uint32_t cellNum;
-    bool endOfTable;    // indicates position one past the last elem
-} Cursor;
+};
 
 void serializeRow(Row* source, void* destination);
 void deserializeRow(void* source, Row* destination);

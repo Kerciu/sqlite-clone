@@ -83,14 +83,15 @@ ExecuteStatus executeStatement(Statement* statement, Table* table) {
 }
 
 ExecuteStatus executeInsert(Statement* statement, Table* table) {
-    if (table->numRows >= TABLE_MAX_ROWS) {
+    void* node = getPage(table->pager, table->rootPageNum);
+    if (*leafNodeNumCells(node) >= LEAF_NODE_MAX_CELLS) {
         return EXECUTE_TABLE_FULL;
     }
 
     Row* rowToInsert = &(statement->rowToInsert);
     Cursor* cursor = tableEnd(table);
-    serializeRow(rowToInsert, cursorValue(cursor));
-    ++(table->numRows);
+
+    leafNodeInsert(cursor, rowToInsert->id, rowToInsert);
 
     free(cursor);
 

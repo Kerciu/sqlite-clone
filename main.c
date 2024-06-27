@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "inputbuf.h"
 #include "statement.h"
-#include "pager.h"
+#include "database.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {

@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "inputbuf.h"
-#include "pager.h"
+#include "types.h"
+#include "database.h"
+#include "node.h"
 
 typedef enum {
     CONSTRUCTION_SUCCESS, CONSTRUCTION_FAILURE_UNRECOGNIZED, CONSTRUCTION_FAILURE_NEGATIVE_ID,
