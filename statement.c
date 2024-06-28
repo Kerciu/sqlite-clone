@@ -18,7 +18,7 @@ SpecialCommandStatus executeSpecialCommand(InputBuf* buffer, Table* table) {
 
     else if (strcmp(buffer->buffer, ".btree") == 0) {
         printf("B-Tree:\n");
-        printLeafNode(getPage(table->pager, 0));
+        printTree(table->pager, 0, 0);
         return SPECIAL_EXEC_SUCCESS;
     }
 
@@ -97,7 +97,7 @@ ExecuteStatus executeStatement(Statement* statement, Table* table) {
 ExecuteStatus executeInsert(Statement* statement, Table* table) {
     void* node = getPage(table->pager, table->rootPageNum);
     uint32_t numCells = (*leafNodeNumCells(node));
-    
+
     Row* rowToInsert = &(statement->rowToInsert); 
     uint32_t keyToInsert = rowToInsert->id;
     Cursor* cursor = tableFind(table, keyToInsert);

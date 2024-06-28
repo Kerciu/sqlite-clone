@@ -38,6 +38,8 @@ uint32_t getNodeMaxKey(void* node);
 
 NodeType getNodeType(void* node);
 void setNodeType(void* node, NodeType type);
-void printLeafNode(void* node);
+
+void indentation(uint32_t level);
+void printTree(Pager* pager, uint32_t pageNum, uint32_t indentationLvl);
 
 #endif
