@@ -22,7 +22,7 @@ typedef enum {
 } SpecialCommandStatus;
 
 typedef enum {
-    EXECUTE_SUCCESS, EXECUTE_TABLE_FULL, EXECUTE_FAILURE
+    EXECUTE_SUCCESS, EXECUTE_TABLE_FULL, EXECUTE_FAILURE, EXECUTE_DUPLICATE_KEY_FOUND
 } ExecuteStatus;
 
 typedef struct {

@@ -197,18 +197,21 @@ Cursor *tableStart(Table *table)
     return startCursor;
 }
 
-Cursor *tableEnd(Table *table)
+Cursor* tableFind(Table* table, uint32_t key)
 {
-    Cursor* endCursor = (Cursor*)malloc(sizeof(Cursor));
-    endCursor->table = table;
-    endCursor->pageNum = table->rootPageNum;
+    // search the tree for a given key
+    // if not present, return position where it should be inserted
 
-    void* rootNode = getPage(table->pager, table->rootPageNum);
-    uint32_t numCells = *leafNodeNumCells(rootNode);
-    endCursor->cellNum = numCells;
-    endCursor->endOfTable = true;
+    uint32_t rootPageNum = table->rootPageNum;
+    void* rootNode = getPage(table->pager, rootPageNum);
 
-    return endCursor;
+    if (getNodeType(rootNode) == NODE_LEAF) {
+        return leafNodeFind(table, rootPageNum, key);
+    }
+    else {
+        fprintf(stderr, "Place for implementing searching internal node!\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void* cursorValue(Cursor* cursor)

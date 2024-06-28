@@ -22,6 +22,7 @@ void *leafNodeValue(void *node, uint32_t cellNum)
 
 void initializeLeafNode(void *node)
 {
+    setNodeType(node, NODE_LEAF);
     *leafNodeNumCells(node) = 0;
 }
 
@@ -45,6 +46,53 @@ void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value) {
     ++(*(leafNodeNumCells(node)));
     *(leafNodeKey(node, cursor->cellNum)) = key;
     serializeRow(value, leafNodeValue(node, cursor->cellNum));
+}
+
+Cursor* leafNodeFind(Table* table, uint32_t pageNum, uint32_t key) {
+    void* node = getPage(table->pager, pageNum);
+    uint32_t numCells = *leafNodeNumCells(node);
+
+    Cursor* cursor = (Cursor*)malloc(sizeof(Cursor));
+    cursor->table = table;
+    cursor->pageNum = pageNum;
+    
+    // Perform binary search
+    uint32_t minIdx = 0;
+    uint32_t onePastMaxIdx = numCells;
+
+    while (onePastMaxIdx != minIdx) {
+        uint32_t idx = (minIdx + onePastMaxIdx) / 2;
+        uint32_t keyAtIdx = *leafNodeKey(node, idx);
+
+        if (key == keyAtIdx) {
+            cursor->cellNum = idx;
+            return cursor;
+        }
+        if (key < keyAtIdx) {
+            onePastMaxIdx = idx;
+        }
+        else {
+            minIdx = idx + 1;
+        }
+    }
+
+    cursor->cellNum = minIdx;
+
+    /* this return either position of the key, position of another key
+    that we will need to move if we want to insert the new key, or
+    position one past the last key
+    */
+    return cursor;
+}
+
+NodeType getNodeType(void* node) {
+    uint8_t value = *((uint8_t*)(node + NODE_TYPE_OFFSET));
+    return (NodeType) value;
+}
+
+void setNodeType(void* node, NodeType type) {
+    uint8_t value = type;
+    *((uint8_t*)node + NODE_TYPE_OFFSET) = value;
 }
 
 void printLeafNode(void* node) {

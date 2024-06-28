@@ -29,8 +29,6 @@ extern const uint32_t ROW_SIZE;
 extern const uint32_t PAGE_SIZE;
 
 /* Node Header Format*/
-typedef enum { NODE_INTERNAL, NODE_LEAF } NodeType;
-
 extern const uint32_t NODE_TYPE_SIZE;
 extern const uint32_t NODE_TYPE_OFFSET;
 extern const uint32_t IS_ROOT_SIZE;
@@ -78,7 +76,7 @@ void pagerFlush(Pager* pager, uint32_t pageNum);
 Pager* openPager(const char* fileHandle);
 
 Cursor* tableStart(Table* table);
-Cursor* tableEnd(Table* table);
+Cursor* tableFind(Table* table, uint32_t key);
 
 void displayRow(Row* row);
 void printConstants(void);

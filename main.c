@@ -60,6 +60,9 @@ int main(int argc, char* argv[]) {
             case EXECUTE_TABLE_FULL:
                 fprintf(stderr, "Error. Full table\n");
                 break;
+            case EXECUTE_DUPLICATE_KEY_FOUND:
+                fprintf(stderr, "Error: Duplicate key\n");
+                break;
             case EXECUTE_FAILURE:
                 fprintf(stderr, "Fatal Error: Execution failure\n");
                 break;
