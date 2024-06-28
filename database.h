@@ -52,17 +52,9 @@ extern const uint32_t LEAF_NODE_CELL_SIZE;
 extern const uint32_t LEAF_NODE_SPACE_FOR_CELLS;
 extern const uint32_t LEAF_NODE_MAX_CELLS;
 
-typedef struct {
-    int fileDescriptor;
-    uint32_t fileLength;
-    uint32_t numPages;
-    void* pages[TABLE_MAX_PAGES];
-} Pager;
-
-struct Table {
-    uint32_t rootPageNum;
-    Pager* pager;
-};
+/* Leaf node sizes */
+extern const uint32_t LEAF_NODE_RIGHT_SPLIT_COUNT;
+extern const uint32_t LEAF_NODE_LEFT_SPLIT_COUNT;
 
 void serializeRow(Row* source, void* destination);
 void deserializeRow(void* source, Row* destination);

@@ -97,12 +97,8 @@ ExecuteStatus executeStatement(Statement* statement, Table* table) {
 ExecuteStatus executeInsert(Statement* statement, Table* table) {
     void* node = getPage(table->pager, table->rootPageNum);
     uint32_t numCells = (*leafNodeNumCells(node));
-    if (numCells >= LEAF_NODE_MAX_CELLS) {
-        return EXECUTE_TABLE_FULL;
-    }
-
-    Row* rowToInsert = &(statement->rowToInsert);
     
+    Row* rowToInsert = &(statement->rowToInsert); 
     uint32_t keyToInsert = rowToInsert->id;
     Cursor* cursor = tableFind(table, keyToInsert);
 

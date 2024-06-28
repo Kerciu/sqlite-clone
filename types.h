@@ -14,7 +14,17 @@ typedef struct {
     char email[EMAIL_MAX_LENGTH + 1];
 } Row;
 
-typedef struct Table Table;
+typedef struct {
+    int fileDescriptor;
+    uint32_t fileLength;
+    uint32_t numPages;
+    void* pages[TABLE_MAX_PAGES];
+} Pager;
+
+typedef struct {
+    uint32_t rootPageNum;
+    Pager* pager;
+} Table;
 
 typedef struct {
     // represents location in a table
