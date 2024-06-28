@@ -23,6 +23,7 @@ void *leafNodeValue(void *node, uint32_t cellNum)
 void initializeLeafNode(void *node)
 {
     setNodeType(node, NODE_LEAF);
+    setNodeRoot(node, false);
     *leafNodeNumCells(node) = 0;
 }
 
@@ -138,12 +139,86 @@ void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value) {
     }
 }
 
-void createNewRoot(Table* table, uint32_t newPage) {
+void createNewRoot(Table* table, uint32_t rightChildPageNum) {
+    /* handle splitting the root, old root copied to new page, becomes left child
+    addres of right child passed it,
+    reinitialize root page to contain the new root node
+    new root node points to two childer
+    */
 
+    void* root = getPage(table->pager, table->rootPageNum);
+    void* rightChild = getPage(table->pager, rightChildPageNum);
+    uint32_t leftChildPageNum = getUnusedPageNum(table->pager);
+    void* leftChild = getPage(table->pager, leftChildPageNum);
+
+    /* left child has data copied from old root */
+    memcpy(leftChild, root, PAGE_SIZE);
+    setNodeRoot(leftChild, false);
+
+    /* root node is a new internal node with one key and two children */
+    initializeInternalNode(root);
+    setNodeRoot(root, true);
+    *internalNodeNumKeys(root) = 1;
+    *internalNodeChild(root, 0) = leftChildPageNum;
+    uint32_t leftChildMaxKey = getNodeMaxKey(leftChild);
+    *internalNodeKey(root, 0) = leftChildMaxKey;
+    *internalNodeRightChild(root) = rightChildPageNum;
 }
 
 bool isNodeRoot(void* node) {
-    return false;
+    uint8_t value = *((uint8_t*)(node + IS_ROOT_OFFSET));
+    return (bool)value;
+}
+
+void setNodeRoot(void* node, bool isRoot) {
+    uint8_t value = isRoot;
+    *((uint8_t*)(node + IS_ROOT_OFFSET)) = value;
+}
+
+uint32_t* internalNodeNumKeys(void* node) {
+    return node + INTERNAL_NODE_NUM_KEYS_OFFSET;
+}
+
+uint32_t* internalNodeCell(void* node, uint32_t cellNum) {
+    return node + INTERNAL_NODE_HEADER_SIZE + cellNum * INTERNAL_NODE_CELL_SIZE;
+}
+
+uint32_t* internalNodeChild(void* node, uint32_t childNum) {
+    uint32_t numKeys = *internalNodeNumKeys(node);
+
+    if (childNum > numKeys) {
+        fprintf(stderr, "Tried to acces childNum %d > numKeys %d\n", childNum, numKeys);
+        exit(EXIT_FAILURE);
+    }
+    else if (childNum == numKeys) {
+        return internalNodeRightChild(node);
+    }
+    else {
+        return internalNodeCell(node, childNum);
+    }
+}
+
+uint32_t* internalNodeKey(void* node, uint32_t keyNum) {
+    return internalNodeCell(node, keyNum) + INTERNAL_NODE_CHILD_SIZE;
+}
+
+uint32_t* internalNodeRightChild(void* node) {
+    return node + INTERNAL_NODE_RIGHT_CHILD_OFFSET;
+}
+
+void initializeInternalNode(void* node) {
+    setNodeType(node, NODE_INTERNAL);
+    setNodeRoot(node, false);
+    *internalNodeNumKeys(node) = 0;
+}
+
+uint32_t getNodeMaxKey(void* node) {
+    switch(getNodeType(node)) {
+        case NODE_INTERNAL:
+            return *internalNodeKey(node, *internalNodeNumKeys(node));
+        case NODE_LEAF:
+            return *leafNodeKey(node, *leafNodeNumCells(node) - 1);
+    }
 }
 
 uint32_t getUnusedPageNum(Pager* pager) {

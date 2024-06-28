@@ -27,6 +27,15 @@ void createNewRoot(Table* table, uint32_t newPage);
 bool isNodeRoot(void* node);
 uint32_t getUnusedPageNum(Pager* pager);
 
+void setNodeRoot(void* node, bool isRoot);
+uint32_t* internalNodeNumKeys(void* node);
+uint32_t* internalNodeCell(void* node, uint32_t cellNum);
+uint32_t* internalNodeChild(void* node, uint32_t childNum);
+uint32_t* internalNodeKey(void* node, uint32_t keyNum);
+uint32_t* internalNodeRightChild(void* node);
+void initializeInternalNode(void* node);
+uint32_t getNodeMaxKey(void* node);
+
 NodeType getNodeType(void* node);
 void setNodeType(void* node, NodeType type);
 void printLeafNode(void* node);

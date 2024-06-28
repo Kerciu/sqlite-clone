@@ -56,6 +56,18 @@ extern const uint32_t LEAF_NODE_MAX_CELLS;
 extern const uint32_t LEAF_NODE_RIGHT_SPLIT_COUNT;
 extern const uint32_t LEAF_NODE_LEFT_SPLIT_COUNT;
 
+/* Internal node header layout */
+extern const uint32_t INTERNAL_NODE_NUM_KEYS_SIZE;
+extern const uint32_t INTERNAL_NODE_NUM_KEYS_OFFSET;
+extern const uint32_t INTERNAL_NODE_RIGHT_CHILD_SIZE;
+extern const uint32_t INTERNAL_NODE_RIGHT_CHILD_OFFSET;
+extern const uint32_t INTERNAL_NODE_HEADER_SIZE;
+
+/* Internal node body layout */
+extern const uint32_t INTERNAL_NODE_KEY_SIZE;
+extern const uint32_t INTERNAL_NODE_CHILD_SIZE;
+extern const uint32_t INTERNAL_NODE_CELL_SIZE;
+
 void serializeRow(Row* source, void* destination);
 void deserializeRow(void* source, Row* destination);
 void* cursorValue(Cursor* cursor);
