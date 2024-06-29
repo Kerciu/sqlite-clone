@@ -70,6 +70,8 @@ extern const uint32_t INTERNAL_NODE_KEY_SIZE;
 extern const uint32_t INTERNAL_NODE_CHILD_SIZE;
 extern const uint32_t INTERNAL_NODE_CELL_SIZE;
 
+extern const uint32_t INTERNAL_NODE_MAX_CELLS;
+
 void serializeRow(Row* source, void* destination);
 void deserializeRow(void* source, Row* destination);
 void* cursorValue(Cursor* cursor);
