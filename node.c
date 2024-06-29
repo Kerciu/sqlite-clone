@@ -86,6 +86,37 @@ Cursor* leafNodeFind(Table* table, uint32_t pageNum, uint32_t key) {
     return cursor;
 }
 
+Cursor* internalNodeFind(Table* table, uint32_t pageNum, uint32_t key) {
+    void* node = getPage(table->pager, pageNum);
+    uint32_t numKeys = *internalNodeNumKeys(node);
+
+    /* binary search to find idx of child to search */
+    uint32_t minIdx = 0;
+    uint32_t maxIdx = numKeys;
+
+    while (minIdx != maxIdx) {
+        uint32_t idx = (minIdx + maxIdx) / 2;
+        uint32_t keyToRight = *internalNodeKey(node, idx);
+
+        if (keyToRight >= key) {
+            maxIdx = idx;
+        }
+        else {
+            minIdx = idx + 1;
+        }
+    }
+
+    uint32_t childNum = *internalNodeChild(node, minIdx);
+    void* childNode = getPage(table->pager, childNum);
+
+    switch (getNodeType(childNode)) {
+        case NODE_LEAF:
+            return leafNodeFind(table, childNum, key);
+        case NODE_INTERNAL:
+            return internalNodeFind(table, childNum, key);
+    }
+}
+
 void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value) {
     /* Create a new node and move half the cells over, insert the new value
     in one of two nodes, then update parent (or create new parent)

@@ -8,7 +8,6 @@
 
 // https://www.programiz.com/dsa/b-tree
 
-
 /* Node Header Format*/
 typedef enum { NODE_INTERNAL, NODE_LEAF } NodeType;
 

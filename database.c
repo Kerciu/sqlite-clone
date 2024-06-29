@@ -223,8 +223,7 @@ Cursor* tableFind(Table* table, uint32_t key)
         return leafNodeFind(table, rootPageNum, key);
     }
     else {
-        fprintf(stderr, "Place for implementing searching internal node!\n");
-        exit(EXIT_FAILURE);
+        return internalNodeFind(table, rootPageNum, key);
     }
 }
 
