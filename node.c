@@ -87,7 +87,7 @@ Cursor* leafNodeFind(Table* table, uint32_t pageNum, uint32_t key) {
     return cursor;
 }
 
-Cursor* internalNodeFindChild(void* node, uint32_t key) {
+uint32_t internalNodeFindChild(void* node, uint32_t key) {
     /* return idx of child which should contain given key */
 
     uint32_t numKeys = *internalNodeNumKeys(node);

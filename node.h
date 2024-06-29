@@ -34,7 +34,12 @@ uint32_t* internalNodeChild(void* node, uint32_t childNum);
 uint32_t* internalNodeKey(void* node, uint32_t keyNum);
 uint32_t* internalNodeRightChild(void* node);
 void initializeInternalNode(void* node);
+uint32_t internalNodeFindChild(void* node, uint32_t key);
 Cursor* internalNodeFind(Table* table, uint32_t pageNum, uint32_t key);
+uint32_t* nodeParent(void* node);
+void internalNodeInsert(Table* table, uint32_t pageNum, uint32_t newPageNum);
+void updateInternalNodeKey(void* node, uint32_t oldKey, uint32_t newKey);
+
 uint32_t getNodeMaxKey(void* node);
 
 NodeType getNodeType(void* node);
