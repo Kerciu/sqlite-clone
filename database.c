@@ -21,7 +21,9 @@ const uint8_t COMMON_NODE_HEADER_SIZE = NODE_TYPE_SIZE + IS_ROOT_SIZE + PARENT_P
 
 const uint32_t LEAF_NODE_NUM_CELLS_SIZE = sizeof(uint32_t);
 const uint32_t LEAF_NODE_NUM_CELLS_OFFSET = COMMON_NODE_HEADER_SIZE;
-const uint32_t LEAF_NODE_HEADER_SIZE = COMMON_NODE_HEADER_SIZE + LEAF_NODE_NUM_CELLS_SIZE;
+const uint32_t LEAF_NODE_NEXT_LEAF_SIZE = sizeof(uint32_t);
+const uint32_t LEAF_NODE_NEXT_LEAF_OFFSET = COMMON_NODE_HEADER_SIZE;
+const uint32_t LEAF_NODE_HEADER_SIZE = COMMON_NODE_HEADER_SIZE + LEAF_NODE_NUM_CELLS_SIZE + LEAF_NODE_NEXT_LEAF_SIZE;
 
 const uint32_t LEAF_NODE_KEY_SIZE = sizeof(uint32_t);
 const uint32_t LEAF_NODE_KEY_OFFSET = 0;
@@ -238,7 +240,16 @@ void cursorAdvance(Cursor* cursor) {
 
     ++(cursor->cellNum);
     if (cursor->cellNum >= (*leafNodeNumCells(node))) {
-        cursor->endOfTable = true;
+        
+        /* advance to next leaf node */
+        uint32_t nextPageNum = *leafNodeNextLeaf(node);
+        if (nextPageNum == 0) { // rightmost leaf
+            cursor->endOfTable = true;
+        }
+        else {
+            cursor->pageNum = nextPageNum;
+            cursor->cellNum = 0;
+        }
     }
 }
 

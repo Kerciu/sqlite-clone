@@ -21,6 +21,7 @@ void initializeLeafNode(void* node);
 void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value);
 Cursor* leafNodeFind(Table* table, uint32_t pageNum, uint32_t key);
 void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value);
+uint32_t* leafNodeNextLeaf(void* node);
 
 void createNewRoot(Table* table, uint32_t newPage);
 bool isNodeRoot(void* node);
@@ -33,6 +34,7 @@ uint32_t* internalNodeChild(void* node, uint32_t childNum);
 uint32_t* internalNodeKey(void* node, uint32_t keyNum);
 uint32_t* internalNodeRightChild(void* node);
 void initializeInternalNode(void* node);
+Cursor* internalNodeFind(Table* table, uint32_t pageNum, uint32_t key);
 uint32_t getNodeMaxKey(void* node);
 
 NodeType getNodeType(void* node);

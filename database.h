@@ -40,6 +40,8 @@ extern const uint8_t COMMON_NODE_HEADER_SIZE;
 /* Leaf Node Header Layout */
 extern const uint32_t LEAF_NODE_NUM_CELLS_SIZE;
 extern const uint32_t LEAF_NODE_NUM_CELLS_OFFSET;
+extern const uint32_t LEAF_NODE_NEXT_LEAF_SIZE;
+extern const uint32_t LEAF_NODE_NEXT_LEAF_OFFSET;
 extern const uint32_t LEAF_NODE_HEADER_SIZE;
 
 /* Leaf Node Body Layout*/

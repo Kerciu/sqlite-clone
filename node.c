@@ -25,6 +25,7 @@ void initializeLeafNode(void *node)
     setNodeType(node, NODE_LEAF);
     setNodeRoot(node, false);
     *leafNodeNumCells(node) = 0;
+    *leafNodeNextLeaf(node) = 0; // no sibling
 }
 
 void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value) {
@@ -127,6 +128,8 @@ void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value) {
 
     void* newNode = getPage(cursor->table->pager, newPageNum);
     initializeLeafNode(newNode);
+    *leafNodeNextLeaf(newNode) = *leafNodeNextLeaf(oldNode);
+    *leafNodeNextLeaf(oldNode) = newPageNum;
 
    /**copy every cell into its new location, all existing keys + new key
     * should be divided evetli between left and right (old and new) nodes,
@@ -146,7 +149,8 @@ void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value) {
         void* destination = leafNodeCell(destinationNode, IdxWithinNode);
 
         if (i == cursor->cellNum) {
-            serializeRow(value, destination);
+            serializeRow(value, leafNodeValue(destinationNode, IdxWithinNode));
+            *leafNodeKey(destinationNode, IdxWithinNode) = key;
         }
         else if (i > cursor->cellNum) {
             memcpy(destination, leafNodeCell(oldNode, i - 1), LEAF_NODE_CELL_SIZE);
@@ -168,6 +172,11 @@ void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value) {
         fprintf(stderr, "Need to implement updating parent after split'\n");
         exit(EXIT_FAILURE);
     }
+}
+
+uint32_t *leafNodeNextLeaf(void *node)
+{
+    return node + LEAF_NODE_NEXT_LEAF_OFFSET;
 }
 
 void createNewRoot(Table* table, uint32_t rightChildPageNum) {
