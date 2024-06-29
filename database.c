@@ -199,16 +199,13 @@ Pager* openPager(const char* fileHandle) {
 
 Cursor *tableStart(Table *table)
 {
-    Cursor* startCursor = (Cursor*)malloc(sizeof(Cursor));
-    startCursor->table = table;
-    startCursor->pageNum = table->rootPageNum;
-    startCursor->cellNum = 0;
+    Cursor* cursor = tableFind(table, 0);
 
-    void* rootNode = getPage(table->pager, table->rootPageNum);
-    uint32_t numCells = *leafNodeNumCells(rootNode);
-    startCursor->endOfTable = (numCells == 0);
+    void* node = getPage(table->pager, cursor->pageNum);
+    uint32_t numCells = *leafNodeNumCells(node);
+    cursor->endOfTable = (numCells == 0);
 
-    return startCursor;
+    return cursor;
 }
 
 Cursor* tableFind(Table* table, uint32_t key)
