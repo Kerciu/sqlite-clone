@@ -97,6 +97,7 @@ ExecuteStatus executeStatement(Statement* statement, Table* table) {
 ExecuteStatus executeInsert(Statement* statement, Table* table) {
     void* node = getPage(table->pager, table->rootPageNum);
     uint32_t numCells = (*leafNodeNumCells(node));
+    printf("executeInsert: numCells before insert=%d\n", numCells); // Debug
 
     Row* rowToInsert = &(statement->rowToInsert); 
     uint32_t keyToInsert = rowToInsert->id;
@@ -112,6 +113,9 @@ ExecuteStatus executeInsert(Statement* statement, Table* table) {
     leafNodeInsert(cursor, rowToInsert->id, rowToInsert);
     free(cursor);
 
+    numCells = *leafNodeNumCells(node);
+    printf("executeInsert: numCells after insert=%d\n", numCells); // Debug
+
     return EXECUTE_SUCCESS;
 
 }
@@ -122,6 +126,8 @@ ExecuteStatus executeSelect(Statement* statement, Table* table) {
     Row row;
     while (!cursor->endOfTable) {
         deserializeRow(cursorValue(cursor), &row);
+        printf("executeSelect: cursor->cellNum=%d, row id=%d, username=%s, email=%s\n", 
+               cursor->cellNum, row.id, row.username, row.email); // Debug
         displayRow(&row);
         cursorAdvance(cursor);
     }

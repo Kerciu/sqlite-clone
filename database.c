@@ -22,7 +22,7 @@ const uint8_t COMMON_NODE_HEADER_SIZE = NODE_TYPE_SIZE + IS_ROOT_SIZE + PARENT_P
 const uint32_t LEAF_NODE_NUM_CELLS_SIZE = sizeof(uint32_t);
 const uint32_t LEAF_NODE_NUM_CELLS_OFFSET = COMMON_NODE_HEADER_SIZE;
 const uint32_t LEAF_NODE_NEXT_LEAF_SIZE = sizeof(uint32_t);
-const uint32_t LEAF_NODE_NEXT_LEAF_OFFSET = COMMON_NODE_HEADER_SIZE;
+const uint32_t LEAF_NODE_NEXT_LEAF_OFFSET = LEAF_NODE_NUM_CELLS_OFFSET + LEAF_NODE_NUM_CELLS_SIZE;
 const uint32_t LEAF_NODE_HEADER_SIZE = COMMON_NODE_HEADER_SIZE + LEAF_NODE_NUM_CELLS_SIZE + LEAF_NODE_NEXT_LEAF_SIZE;
 
 const uint32_t LEAF_NODE_KEY_SIZE = sizeof(uint32_t);
@@ -207,6 +207,7 @@ Cursor *tableStart(Table *table)
     uint32_t numCells = *leafNodeNumCells(node);
     cursor->endOfTable = (numCells == 0);
 
+    printf("tableStart: endOfTable=%d, numCells=%d\n", cursor->endOfTable, numCells); // Debug
     return cursor;
 }
 
@@ -249,8 +250,18 @@ void cursorAdvance(Cursor* cursor) {
         else {
             cursor->pageNum = nextPageNum;
             cursor->cellNum = 0;
+            cursor->endOfTable = false;
+            printf("cursorAdvance: pageNum=%d, cellNum=%d, endOfTable=%d\n", 
+                pageNum, cursor->cellNum, cursor->endOfTable); // Debug
         }
     }
+    else {
+        cursor->endOfTable = false;
+        printf("cursorAdvance: pageNum=%d, cellNum=%d, endOfTable=%d\n", 
+           pageNum, cursor->cellNum, cursor->endOfTable); // Debug
+    }
+    printf("cursorAdvance: pageNum=%d, cellNum=%d, endOfTable=%d\n", 
+           cursor->pageNum, cursor->cellNum, cursor->endOfTable); // Debug
 }
 
 void printConstants(void) {
