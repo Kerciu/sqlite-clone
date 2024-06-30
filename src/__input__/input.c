@@ -1,14 +1,14 @@
-#include "inputbuf.h"
+#include "input.h"
 
-InputBuf* createInputBuffer(void) {
-    InputBuf* buf = (InputBuf*)malloc(sizeof(InputBuf));
+InputBuffer* createInputBuffer(void) {
+    InputBuffer* buf = (InputBuffer*)malloc(sizeof(InputBuffer));
     buf->buffer = NULL;
     buf->bufferSize = buf->inputBuffer = 0;
 
     return buf;
 }
 
-void destroyInputBuffer(InputBuf* buf) {
+void destroyInputBuffer(InputBuffer* buf) {
     if (buf) {
         free(buf->buffer);
         free(buf);
@@ -19,7 +19,7 @@ void printPrompt(void) {
     printf(" >> ");
 }
 
-void fetchCommand(InputBuf* buf) {
+void fetchCommand(InputBuffer* buf) {
     if (buf == NULL) return;
 
     ssize_t readBytes = getline(&(buf->buffer), &(buf->bufferSize), stdin);

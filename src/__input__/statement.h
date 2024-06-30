@@ -3,10 +3,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "inputbuf.h"
-#include "types.h"
-#include "database.h"
-#include "node.h"
+#include "input.h"
+#include "../db/database.h"
 
 typedef enum {
     CONSTRUCTION_SUCCESS, CONSTRUCTION_FAILURE_UNRECOGNIZED, CONSTRUCTION_FAILURE_NEGATIVE_ID,
@@ -14,7 +12,7 @@ typedef enum {
 } StatementStatus;
 
 typedef enum {
-    STATEMENT_INSERT, STATEMENT_SELECT
+    STATEMENT_INSERT, STATEMENT_SELECT, STATEMENT_UPDATE, STATEMENT_SORT, STATEMENT_DELETE, STATEMENT_DROP
 } StatementType;
 
 typedef enum {
@@ -30,10 +28,14 @@ typedef struct {
     Row rowToInsert;            // Only to use by insert statement
 } Statement;
 
-SpecialCommandStatus executeSpecialCommand(InputBuf* buffer, Table* table);
-StatementStatus constructStatement(InputBuf* buffer, Statement* statement);
+SpecialCommandStatus executeSpecialCommand(InputBuffer* buffer, Table* table);
+StatementStatus constructStatement(InputBuffer* buffer, Statement* statement);
 ExecuteStatus executeStatement(Statement* statement, Table* table);
 ExecuteStatus executeInsert(Statement* statement, Table* table);
 ExecuteStatus executeSelect(Statement* statement, Table* table);
+ExecuteStatus executeDelete(Statement* statement, Table* table);
+ExecuteStatus executeUpdate(Statement* statement, Table* table);
+ExecuteStatus executeSort(Statement* statement, Table* table);
+ExecuteStatus executeDrop(Statement* statement, Table* table);
 
 #endif

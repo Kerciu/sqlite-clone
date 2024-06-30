@@ -12,11 +12,11 @@ typedef struct {
     char* buffer;
     size_t bufferSize;
     ssize_t inputBuffer;
-} InputBuf;
+} InputBuffer;
 
-InputBuf* createInputBuffer(void);
-void destroyInputBuffer(InputBuf* buf);
+InputBuffer* createInputBuffer(void);
+void destroyInputBuffer(InputBuffer* buf);
 void printPrompt(void);
-void fetchCommand(InputBuf* buf);
+void fetchCommand(InputBuffer* buf);
 
 #endif // INPUT_BUFFER

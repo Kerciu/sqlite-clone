@@ -1,11 +1,6 @@
 #ifndef DATABASE
 #define DATABASE
 
-/*
-    For now I will store data in pages
-    later on I will implement B-Trees
-*/
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>

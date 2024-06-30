@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "inputbuf.h"
-#include "statement.h"
-#include "database.h"
+#include "src/__input__/input.h"
+#include "src/__input__/statement.h"
+#include "src/db/database.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
     char* fileHandle = argv[1];
     Table* table = openDataBase(fileHandle);
 
-    InputBuf* input = createInputBuffer();
+    InputBuffer* input = createInputBuffer();
     if (input == NULL || table == NULL) {
         if (table) closeDataBase(table);
         if (input) free(input);
