@@ -6,6 +6,8 @@
 #include "types.h"
 #include "database.h"
 
+#define INVALID_PAGE_NUM UINT32_MAX
+
 // https://www.programiz.com/dsa/b-tree
 
 /* Node Header Format*/
@@ -37,10 +39,11 @@ void initializeInternalNode(void* node);
 uint32_t internalNodeFindChild(void* node, uint32_t key);
 Cursor* internalNodeFind(Table* table, uint32_t pageNum, uint32_t key);
 uint32_t* nodeParent(void* node);
+void internalNodeSplitAndInsert(Table* table, uint32_t parentPageNum, uint32_t childPageNum) ;
 void internalNodeInsert(Table* table, uint32_t pageNum, uint32_t newPageNum);
 void updateInternalNodeKey(void* node, uint32_t oldKey, uint32_t newKey);
 
-uint32_t getNodeMaxKey(void* node);
+uint32_t getNodeMaxKey(Pager* pager, void* node);
 
 NodeType getNodeType(void* node);
 void setNodeType(void* node, NodeType type);
