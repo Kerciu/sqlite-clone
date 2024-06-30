@@ -8,8 +8,6 @@ const uint32_t USERNAME_OFFSET = ID_OFFSET + ID_SIZE;
 const uint32_t EMAIL_OFFSET = USERNAME_OFFSET + USERNAME_SIZE;
 const uint32_t ROW_SIZE = ID_SIZE + USERNAME_SIZE + EMAIL_SIZE;
 const uint32_t PAGE_SIZE = 4096;
-const uint32_t ROWS_PER_PAGE = PAGE_SIZE / ROW_SIZE;
-const uint32_t TABLE_MAX_ROWS = ROWS_PER_PAGE * TABLE_MAX_PAGES;
 
 const uint32_t NODE_TYPE_SIZE = sizeof(uint8_t);
 const uint32_t NODE_TYPE_OFFSET = 0;
@@ -52,8 +50,8 @@ const uint32_t INTERNAL_NODE_MAX_CELLS = 3;
 void serializeRow(Row *source, void *destination)
 {
     memcpy(destination + ID_OFFSET, &(source->id), ID_SIZE);
-    strncpy(destination + USERNAME_OFFSET, source->username, USERNAME_SIZE);
-    strncpy(destination + EMAIL_OFFSET, source->email, EMAIL_SIZE);
+    memcpy(destination + USERNAME_OFFSET, &(source->username), USERNAME_SIZE);
+    memcpy(destination + EMAIL_OFFSET, &(source->email), EMAIL_SIZE);
 }
 
 void deserializeRow(void* source, Row* destination)
@@ -252,18 +250,8 @@ void cursorAdvance(Cursor* cursor) {
         else {
             cursor->pageNum = nextPageNum;
             cursor->cellNum = 0;
-            cursor->endOfTable = false;
-            printf("cursorAdvance: pageNum=%d, cellNum=%d, endOfTable=%d\n", 
-                pageNum, cursor->cellNum, cursor->endOfTable); // Debug
         }
     }
-    else {
-        cursor->endOfTable = false;
-        printf("cursorAdvance: pageNum=%d, cellNum=%d, endOfTable=%d\n", 
-           pageNum, cursor->cellNum, cursor->endOfTable); // Debug
-    }
-    printf("cursorAdvance: pageNum=%d, cellNum=%d, endOfTable=%d\n", 
-           cursor->pageNum, cursor->cellNum, cursor->endOfTable); // Debug
 }
 
 void printConstants(void) {

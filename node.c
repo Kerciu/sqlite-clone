@@ -57,6 +57,7 @@ Cursor* leafNodeFind(Table* table, uint32_t pageNum, uint32_t key) {
     Cursor* cursor = (Cursor*)malloc(sizeof(Cursor));
     cursor->table = table;
     cursor->pageNum = pageNum;
+    cursor->endOfTable = false;
     
     // Perform binary search
     uint32_t minIdx = 0;
@@ -145,7 +146,7 @@ void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value) {
     * should be divided evetli between left and right (old and new) nodes,
     * starting from the right, move each key to correct position. */
 
-    for (int32_t i = 0; i< LEAF_NODE_MAX_CELLS; ++i) {
+    for (int32_t i = LEAF_NODE_MAX_CELLS; i >= 0; --i) {
         void* destinationNode;
 
         if (i >= LEAF_NODE_LEFT_SPLIT_COUNT) {
@@ -175,8 +176,7 @@ void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value) {
     *(leafNodeNumCells(newNode)) = LEAF_NODE_RIGHT_SPLIT_COUNT;
 
     if (isNodeRoot(oldNode)) {
-        createNewRoot(cursor->table, newPageNum);
-        return;
+        return createNewRoot(cursor->table, newPageNum);
     }
     else {
         // fprintf(stderr, "Need to implement updating parent after split'\n");
@@ -209,6 +209,7 @@ void internalNodeSplitAndInsert(Table* table, uint32_t parentPageNum, uint32_t c
     uint32_t childMax = getNodeMaxKey(table->pager, child);
 
     uint32_t newPageNum = getUnusedPageNum(table->pager);
+
     uint32_t splittingRoot = isNodeRoot(oldNode);
 
     void* parent;
@@ -283,10 +284,9 @@ void internalNodeInsert(Table* table, uint32_t pageNum, uint32_t newPageNum) {
     void* childNode = getPage(table->pager, newPageNum);
 
     uint32_t childMaxKey = getNodeMaxKey(table->pager, childNode);
-    uint32_t idx = internalNodeFindChild(childNode, newPageNum);
+    uint32_t idx = internalNodeFindChild(parentNode, childMaxKey);
 
     uint32_t originalNumKeys = *internalNodeNumKeys(parentNode);
-    *internalNodeNumKeys(parentNode) = originalNumKeys + 1;
 
     if (originalNumKeys >= INTERNAL_NODE_MAX_CELLS) {
         internalNodeSplitAndInsert(table, pageNum, newPageNum);
@@ -297,7 +297,9 @@ void internalNodeInsert(Table* table, uint32_t pageNum, uint32_t newPageNum) {
     /* internal node with right child of invalid page number is empty */
     if (rightChildPageNum == INVALID_PAGE_NUM) {
         *internalNodeRightChild(parentNode) = newPageNum;
+        return;
     }
+
     void* rightChildNode = getPage(table->pager, rightChildPageNum);
     *internalNodeNumKeys(parentNode) = originalNumKeys + 1;
 
@@ -429,7 +431,7 @@ uint32_t getNodeMaxKey(Pager* pager, void* node) {
     if (getNodeType(node) == NODE_LEAF) {
         return *leafNodeKey(node, *leafNodeNumCells(node) - 1);
     }
-    void* rightChild = getPage(pager, * internalNodeRightChild(node));
+    void* rightChild = getPage(pager, *internalNodeRightChild(node));
     return getNodeMaxKey(pager, rightChild);
 }
 
