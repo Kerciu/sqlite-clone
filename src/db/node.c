@@ -50,6 +50,14 @@ void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value) {
     serializeRow(value, leafNodeValue(node, cursor->cellNum));
 }
 
+void leafNodeUpdate(Cursor* cursor, uint32_t key, Row* value) {
+    void* node = getPage(cursor->table->pager, cursor->pageNum);
+    uint32_t numCells = *leafNodeNumCells(node);
+    
+    *(leafNodeKey(node, cursor->cellNum)) = key;
+    serializeRow(value, leafNodeValue(node, cursor->cellNum));
+}
+
 Cursor* leafNodeFind(Table* table, uint32_t pageNum, uint32_t key) {
     void* node = getPage(table->pager, pageNum);
     uint32_t numCells = *leafNodeNumCells(node);

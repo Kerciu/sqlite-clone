@@ -39,7 +39,7 @@ StatementStatus constructStatement(InputBuffer* buffer, Statement* statement) {
 
     if (strncmp(buffer->buffer, "update", 5) == 0) {
 
-        return constructUpdate(statement);
+        return constructUpdate(buffer, statement);
     }
 
     if (strncmp(buffer->buffer, "delete", 6) == 0) {

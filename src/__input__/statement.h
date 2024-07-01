@@ -20,16 +20,23 @@ typedef enum {
 } SpecialCommandStatus;
 
 typedef enum {
-    EXECUTE_SUCCESS, EXECUTE_TABLE_FULL, EXECUTE_FAILURE, EXECUTE_DUPLICATE_KEY_FOUND
+    EXECUTE_SUCCESS, EXECUTE_TABLE_FULL, EXECUTE_FAILURE, EXECUTE_DUPLICATE_KEY_FOUND, EXECUTE_NO_ROW_FOUND
 } ExecuteStatus;
 
 typedef struct {
     StatementType type;
     Row rowToInsert;            // Only to use by insert statement
+    Row rowToUpdate;            // Only to use by update statement
 } Statement;
 
 SpecialCommandStatus executeSpecialCommand(InputBuffer* buffer, Table* table);
 StatementStatus constructStatement(InputBuffer* buffer, Statement* statement);
+StatementStatus constructInsert(InputBuffer* buffer, Statement* statement);
+StatementStatus constructSelect(Statement* statement);
+StatementStatus constructDelete(Statement* statement);
+StatementStatus constructUpdate(InputBuffer* buffer, Statement* statement);
+StatementStatus constructSort(Statement* statement);
+StatementStatus constructDrop(Statement* statement);
 ExecuteStatus executeStatement(Statement* statement, Table* table);
 ExecuteStatus executeInsert(Statement* statement, Table* table);
 ExecuteStatus executeSelect(Statement* statement, Table* table);

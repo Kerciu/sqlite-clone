@@ -21,7 +21,7 @@ StatementStatus constructInsert(InputBuffer* buffer, Statement* statement) {
     if (strlen(username) > USERNAME_MAX_LENGTH) {
         return CONSTRUCTION_FAILURE_TOO_LONG;
     }
-    if (strlen(username) > USERNAME_MAX_LENGTH) {
+    if (strlen(email) > EMAIL_MAX_LENGTH) {
         return CONSTRUCTION_FAILURE_TOO_LONG;
     }
 

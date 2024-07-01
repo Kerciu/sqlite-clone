@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "src/__input__/input.h"
-#include "src/__input__/statement.h"
-#include "src/db/database.h"
+#include "__input__/input.h"
+#include "__input__/statement.h"
+#include "db/database.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -65,6 +65,9 @@ int main(int argc, char* argv[]) {
                 break;
             case EXECUTE_FAILURE:
                 fprintf(stderr, "Fatal Error: Execution failure\n");
+                break;
+            case EXECUTE_NO_ROW_FOUND:
+                fprintf(stderr, "Error: No such row (of id %d) to update found\n", statement.rowToUpdate.id);
                 break;
         }
     }
