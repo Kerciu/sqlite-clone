@@ -8,6 +8,14 @@
 #define EMAIL_MAX_LENGTH 256
 #define TABLE_MAX_PAGES 100
 
+typedef enum {
+    ALIGN_IN_BOUNDS, ALIGN_STARTING_FROM, ALIGN_END_TO
+} AlignType;
+
+typedef enum {
+    BOUND_CREATION_SUCCESS, BOUND_CREATION_FAILURE
+} BoundStatus;
+
 typedef struct {
     uint32_t id;
     char username[USERNAME_MAX_LENGTH + 1];
@@ -33,5 +41,11 @@ typedef struct {
     uint32_t cellNum;
     bool endOfTable;    // indicates position one past the last elem
 } Cursor;
+
+typedef struct {
+    AlignType type;
+    uint32_t startIdx;
+    uint32_t endIdx;
+} Align;
 
 #endif

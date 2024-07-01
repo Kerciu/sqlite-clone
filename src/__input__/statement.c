@@ -47,9 +47,9 @@ StatementStatus constructStatement(InputBuffer* buffer, Statement* statement) {
         return constructDelete(statement);
     }
 
-    if (strncmp(buffer->buffer, "sort", 4) == 0) {
+    if (strncmp(buffer->buffer, "align", 4) == 0) {
         
-        return constructSort(statement);
+        return constructAlign(statement);
     }
 
     if (strncmp(buffer->buffer, "drop", 4) == 0) {
@@ -74,8 +74,8 @@ ExecuteStatus executeStatement(Statement* statement, Table* table) {
         case STATEMENT_DELETE:
             return executeDelete(statement, table);
         
-        case STATEMENT_SORT:
-            return executeSort(statement, table);
+        case STATEMENT_ALIGN:
+            return executeAlign(statement, table);
         
         case STATEMENT_DROP:
             return executeSort(statement, table);
