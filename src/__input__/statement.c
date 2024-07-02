@@ -27,32 +27,32 @@ SpecialCommandStatus executeSpecialCommand(InputBuffer* buffer, Table* table) {
 
 StatementStatus constructStatement(InputBuffer* buffer, Statement* statement) {
 
-    if (strncmp(buffer->buffer, "insert", 6) == 0) {
+    if (strncmp(buffer->buffer, "INSERT", 6) == 0) {
 
         return constructInsert(buffer, statement);
     }
 
-    if (strncmp(buffer->buffer, "select", 6) == 0) {
+    if (strncmp(buffer->buffer, "SELECT", 6) == 0) {
 
         return constructSelect(buffer, statement);
     }
 
-    if (strncmp(buffer->buffer, "update", 5) == 0) {
+    if (strncmp(buffer->buffer, "UPDATE", 5) == 0) {
 
         return constructUpdate(buffer, statement);
     }
 
-    if (strncmp(buffer->buffer, "delete", 6) == 0) {
+    if (strncmp(buffer->buffer, "DELETE", 6) == 0) {
 
         return constructDelete(buffer, statement);
     }
 
-    if (strncmp(buffer->buffer, "align", 4) == 0) {
+    if (strncmp(buffer->buffer, "ALIGN", 4) == 0) {
         
         return constructAlign(buffer, statement);
     }
 
-    if (strncmp(buffer->buffer, "drop", 4) == 0) {
+    if (strncmp(buffer->buffer, "DROP", 4) == 0) {
         return constructDrop(statement);
     }
 

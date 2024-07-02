@@ -6,5 +6,16 @@ StatementStatus constructDrop(Statement* statement) {
 }
 
 ExecuteStatus executeDrop(Statement* statement, Table* table) {
-    return EXECUTE_FAILURE;
+    // TODO IMPLEMENT THIS !!
+    for (uint32_t i = table->pager->numPages - 1; i >= 0; --i) {
+        if (table->pager->pages[i] != NULL) {
+            free(table->pager->pages[i]);
+            table->pager->pages[i] = NULL;
+        }
+    }
+
+    table->pager->numPages = 0;
+    table->rootPageNum = 0;
+
+    return EXECUTE_SUCCESS;
 }

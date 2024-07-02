@@ -50,7 +50,7 @@ void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value) {
     serializeRow(value, leafNodeValue(node, cursor->cellNum));
 }
 
-void leafNodeDelete(Cursor* cursor, uint32_t key) {
+void leafNodeDelete(Cursor* cursor) {
     void* node = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t numCells = *leafNodeNumCells(node);
 
@@ -61,6 +61,13 @@ void leafNodeDelete(Cursor* cursor, uint32_t key) {
         }
 
         --(*leafNodeNumCells(node));
+    }
+}
+
+void leafNodeDropAll(Cursor* cursor) {
+    while(!cursor->endOfTable) {
+        leafNodeDelete(cursor);
+        cursorAdvance(cursor);
     }
 }
 
