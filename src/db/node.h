@@ -22,6 +22,7 @@ void* leafNodeValue(void* node, uint32_t cellNum);
 void initializeLeafNode(void* node);
 void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value);
 void leafNodeUpdate(Cursor* cursor, uint32_t key, Row* value);
+void leafNodeDelete(Cursor* cursor, uint32_t key);
 Cursor* leafNodeFind(Table* table, uint32_t pageNum, uint32_t key);
 void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value);
 uint32_t* leafNodeNextLeaf(void* node);

@@ -207,7 +207,6 @@ Cursor *tableStart(Table *table)
     uint32_t numCells = *leafNodeNumCells(node);
     cursor->endOfTable = (numCells == 0);
 
-    printf("tableStart: endOfTable=%d, numCells=%d\n", cursor->endOfTable, numCells); // Debug
     return cursor;
 }
 
