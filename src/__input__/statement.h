@@ -28,15 +28,15 @@ typedef enum {
 typedef struct {
     StatementType type;
     Row rowToInsert;            // Only to use by insert statement
-    Row rowToUpdate;            // Only to use by update statement
+    Row rowToChange;            // Only to use by update or delete statement
     Align alignBounds;          // Only to use by align statement
 } Statement;
 
 SpecialCommandStatus executeSpecialCommand(InputBuffer* buffer, Table* table);
 StatementStatus constructStatement(InputBuffer* buffer, Statement* statement);
 StatementStatus constructInsert(InputBuffer* buffer, Statement* statement);
-StatementStatus constructSelect(Statement* statement);
-StatementStatus constructDelete(Statement* statement);
+StatementStatus constructSelect(InputBuffer* buffer, Statement* statement);
+StatementStatus constructDelete(InputBuffer* buffer, Statement* statement);
 StatementStatus constructUpdate(InputBuffer* buffer, Statement* statement);
 StatementStatus constructAlign(InputBuffer* buffer, Statement* statement);
 StatementStatus constructDrop(Statement* statement);

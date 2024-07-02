@@ -34,7 +34,7 @@ StatementStatus constructStatement(InputBuffer* buffer, Statement* statement) {
 
     if (strncmp(buffer->buffer, "select", 6) == 0) {
 
-        return constructSelect(statement);
+        return constructSelect(buffer, statement);
     }
 
     if (strncmp(buffer->buffer, "update", 5) == 0) {
@@ -44,7 +44,7 @@ StatementStatus constructStatement(InputBuffer* buffer, Statement* statement) {
 
     if (strncmp(buffer->buffer, "delete", 6) == 0) {
 
-        return constructDelete(statement);
+        return constructDelete(buffer, statement);
     }
 
     if (strncmp(buffer->buffer, "align", 4) == 0) {

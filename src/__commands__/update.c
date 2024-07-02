@@ -21,9 +21,9 @@ StatementStatus constructUpdate(InputBuffer* buffer, Statement* statement) {
         return CONSTRUCTION_FAILURE_TOO_LONG;
     }
 
-    statement->rowToUpdate.id = id;
-    strcpy(statement->rowToUpdate.username, username);
-    strcpy(statement->rowToUpdate.email, email);
+    statement->rowToChange.id = id;
+    strcpy(statement->rowToChange.username, username);
+    strcpy(statement->rowToChange.email, email);
 
     statement->type = STATEMENT_UPDATE;
     return CONSTRUCTION_SUCCESS;
@@ -33,7 +33,7 @@ ExecuteStatus executeUpdate(Statement* statement, Table* table) {
     void* node = getPage(table->pager, table->rootPageNum);
     uint32_t numCells = *leafNodeNumCells(node);
 
-    Row* rowToUpdate = &(statement->rowToUpdate);
+    Row* rowToUpdate = &(statement->rowToChange);
     uint32_t keyToUpdate = rowToUpdate->id;
     Cursor* cursor = tableFind(table, keyToUpdate);
     

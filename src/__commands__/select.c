@@ -1,6 +1,6 @@
 #include "../__input__/statement.h"
 
-StatementStatus constructSelect(Statement* statement) {
+StatementStatus constructSelect(InputBuffer* buffer, Statement* statement) {
     statement->type = STATEMENT_SELECT;
     return CONSTRUCTION_SUCCESS;
 }

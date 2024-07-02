@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
                 fprintf(stderr, "Fatal Error: Execution failure\n");
                 break;
             case EXECUTE_NO_ROW_FOUND:
-                fprintf(stderr, "Error: No such row (of id %d) to update found\n", statement.rowToUpdate.id);
+                fprintf(stderr, "Error: No such row (of id %d) to change found\n", statement.rowToChange.id);
                 break;
         }
     }
