@@ -49,7 +49,7 @@ StatementStatus constructStatement(InputBuffer* buffer, Statement* statement) {
 
     if (strncmp(buffer->buffer, "align", 4) == 0) {
         
-        return constructAlign(statement);
+        return constructAlign(buffer, statement);
     }
 
     if (strncmp(buffer->buffer, "drop", 4) == 0) {
@@ -78,7 +78,7 @@ ExecuteStatus executeStatement(Statement* statement, Table* table) {
             return executeAlign(statement, table);
         
         case STATEMENT_DROP:
-            return executeSort(statement, table);
+            return executeDrop(statement, table);
 
         default:
             return EXECUTE_FAILURE;

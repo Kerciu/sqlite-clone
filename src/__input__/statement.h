@@ -38,7 +38,7 @@ StatementStatus constructInsert(InputBuffer* buffer, Statement* statement);
 StatementStatus constructSelect(Statement* statement);
 StatementStatus constructDelete(Statement* statement);
 StatementStatus constructUpdate(InputBuffer* buffer, Statement* statement);
-StatementStatus constructAlign(Statement* statement);
+StatementStatus constructAlign(InputBuffer* buffer, Statement* statement);
 StatementStatus constructDrop(Statement* statement);
 ExecuteStatus executeStatement(Statement* statement, Table* table);
 ExecuteStatus executeInsert(Statement* statement, Table* table);
