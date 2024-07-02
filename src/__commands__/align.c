@@ -30,18 +30,24 @@ StatementStatus constructAlign(InputBuffer* buffer, Statement* statement) {
     char* command = strtok(buffer->buffer, " ");
     char* argOne = strtok(NULL, " ");
     char* argTwo = strtok(NULL, " ");
-
-    if (argOne == NULL || argTwo == NULL) {
-        return CONSTRUCTION_SYNTAX_ERROR;
-    }
-
     Align align;
 
-    if (strcmp(argOne, "end") == 0) {
+    if (argOne == NULL || argTwo == NULL) {
+        align.startIdx = 0;
+        align.endIdx = INT_MAX;
+        align.type = ALIGN_IN_BOUNDS;
+        statement->alignBounds = align;
+        statement->type = STATEMENT_ALIGN;
+        return CONSTRUCTION_SUCCESS;
+    }
+
+
+    if (strcmp(argOne, "END") == 0) {
         align.type = ALIGN_END_TO;
         
         if (validateBound(argTwo) == BOUND_CREATION_SUCCESS) {
             uint32_t endBound = atoi(argTwo);
+            align.startIdx = 0;
             align.endIdx = atoi(argTwo);
         }
         else {
@@ -53,12 +59,13 @@ StatementStatus constructAlign(InputBuffer* buffer, Statement* statement) {
         return CONSTRUCTION_SUCCESS;
     }
 
-    if (strcmp(argOne, "start") == 0) {
+    if (strcmp(argOne, "START") == 0) {
         align.type = ALIGN_STARTING_FROM;
 
         if (validateBound(argTwo) == BOUND_CREATION_SUCCESS) {
             uint32_t endBound = atoi(argTwo);
             align.startIdx = atoi(argTwo);
+            align.endIdx = INT_MAX;
         }
         else {
             return CONSTRUCTION_FAILURE_WRONG_BONDS;
@@ -84,5 +91,28 @@ StatementStatus constructAlign(InputBuffer* buffer, Statement* statement) {
 }
 
 ExecuteStatus executeAlign(Statement* statement, Table* table) {
+    void* node = getPage(table->pager, table->rootPageNum);
+    uint32_t numCells = *leafNodeNumCells(node);
     
+    uint32_t start = statement->alignBounds.startIdx;
+    uint32_t end = statement->alignBounds.endIdx;
+
+    end = (end == INT_MAX ? getNodeMaxKey(table->pager, node) : end);
+
+    Row* row;
+    Cursor* cursor = tableFind(table, start);
+    if (cursor->cellNum < numCells) {
+        for (uint32_t i = start; i <= end || !cursor->endOfTable; ++i) {
+            deserializeRow(cursorValue(cursor), row);
+
+            if (row->id != i && row->id <= end) {
+                *(leafNodeKey(node, cursor->cellNum)) = i;
+            }
+
+            serializeRow(row, leafNodeValue(node, cursor->cellNum));
+            cursorAdvance(cursor);
+        }
+    }
+
+    return EXECUTE_SUCCESS;
 }

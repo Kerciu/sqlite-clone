@@ -30,7 +30,7 @@ ExecuteStatus executeDelete(Statement* statement, Table* table) {
         uint32_t keyAtIdx = *leafNodeKey(node, cursor->cellNum);
 
         if (keyAtIdx == keyToDelete) {
-            leafNodeDelete(cursor, keyToDelete);
+            leafNodeDelete(cursor);
             free(cursor);
             return EXECUTE_SUCCESS;
         }
