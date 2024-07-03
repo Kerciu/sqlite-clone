@@ -102,8 +102,10 @@ Table* openDataBase(const char* fileHandle) {
         fprintf(stderr, "Memory allocation failed\n");
         return NULL;
     }
+
     Pager* pager = openPager(fileHandle);
 
+    table->fileHandle = fileHandle;
     table->pager = pager;
     table->rootPageNum = 0;
 

@@ -69,6 +69,8 @@ int main(int argc, char* argv[]) {
             case EXECUTE_NO_ROW_FOUND:
                 fprintf(stderr, "Error: No such row (of id %d) to change found\n", statement.rowToChange.id);
                 break;
+            case EXECUTE_DROP_FAILURE:
+                fprintf(stderr, "Failed to drop the data base \"%s\"\n", table->fileHandle);
         }
     }
 

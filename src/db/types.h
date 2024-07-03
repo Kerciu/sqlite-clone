@@ -30,6 +30,7 @@ typedef struct {
 } Pager;
 
 typedef struct {
+    char* fileHandle;
     uint32_t rootPageNum;
     Pager* pager;
 } Table;
