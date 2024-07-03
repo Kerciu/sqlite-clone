@@ -16,7 +16,8 @@ typedef enum {
 
 typedef enum {
     STATEMENT_INSERT, STATEMENT_SELECT, STATEMENT_UPDATE, STATEMENT_ALIGN,
-    STATEMENT_DELETE, STATEMENT_DROP, STATEMENT_OPEN_TABLE
+    STATEMENT_DELETE, STATEMENT_DROP, STATEMENT_OPEN_TABLE,
+    STATEMENT_HELP
 } StatementType;
 
 typedef enum {
@@ -35,6 +36,7 @@ typedef struct {
     Row rowToChange;            // Only to use by update or delete statement
     Align alignBounds;          // Only to use by align statement
     char* workingFileName;      // Only to use by open and create statement
+    char* commandManual;        // Only to use by help statement
 } Statement;
 
 SpecialCommandStatus executeSpecialCommand(InputBuffer* buffer, Table* table);
@@ -44,8 +46,9 @@ StatementStatus constructSelect(InputBuffer* buffer, Statement* statement);
 StatementStatus constructDelete(InputBuffer* buffer, Statement* statement);
 StatementStatus constructUpdate(InputBuffer* buffer, Statement* statement);
 StatementStatus constructAlign(InputBuffer* buffer, Statement* statement);
-StatementStatus constructDrop(Statement* statement);
+StatementStatus constructDrop(InputBuffer* buffer, Statement* statement);
 StatementStatus constructOpenTable(InputBuffer* buffer, Statement* statement);
+StatementStatus constructHelp(InputBuffer* buffer, Statement* statement);
 ExecuteStatus executeStatement(Statement* statement, Table* table);
 ExecuteStatus executeInsert(Statement* statement, Table* table);
 ExecuteStatus executeSelect(Statement* statement, Table* table);
@@ -54,5 +57,6 @@ ExecuteStatus executeUpdate(Statement* statement, Table* table);
 ExecuteStatus executeAlign(Statement* statement, Table* table);
 ExecuteStatus executeDrop(Statement* statement, Table* table);
 ExecuteStatus executeOpenTable(Statement* statement, Table** table);
+ExecuteStatus executeHelp(Statement* statement);
 
 #endif

@@ -53,11 +53,15 @@ StatementStatus constructStatement(InputBuffer* buffer, Statement* statement) {
     }
 
     if (strncmp(buffer->buffer, "DROP", 4) == 0) {
-        return constructDrop(statement);
+        return constructDrop(buffer, statement);
     }
 
     if (strncmp(buffer->buffer, "OPEN TABLE", 10) == 0) {
         return constructOpenTable(buffer, statement);
+    }
+
+    if (strncmp(buffer->buffer, "HELP", 4) == 0) {
+        return constructHelp(buffer, statement);
     }
 
     return CONSTRUCTION_FAILURE_UNRECOGNIZED;
@@ -86,6 +90,9 @@ ExecuteStatus executeStatement(Statement* statement, Table* table) {
 
         case STATEMENT_OPEN_TABLE:
             return executeOpenTable(statement, &table);
+        
+        case STATEMENT_HELP:
+            return executeHelp(statement);
 
         default:
             return EXECUTE_FAILURE;
