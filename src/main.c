@@ -5,20 +5,32 @@
 
 void printUsage(const char* programName) {
     fprintf(stderr, "Usage: %s [<file-name>]\n", programName);
-    fprintf(stderr, " - No arguments: Need to use \"CREATE TABLE <file-name>\" or OPEN \"<file-name>\"\n");
+    fprintf(stderr, " - No arguments: Need to use \"OPEN TABLE <file-name>\"\n");
     fprintf(stderr, " - <file-name>: Use the specified file as the database\n");
 }
 
-void chooseWorkingDB(InputBuffer* buffer, Statement* statement, Table* table) {
-    printf("Enter in \"CREATE TABLE <file-name>\" or \"OPEN <file-name>\" to start\n");
-    fetchCommand(buffer);
+void printEncourageMsg(void) {
+    printf("Enter in \"OPEN TABLE <file-name>\" to create or open table\n");
+    printf("Enter in \"HELP\" for command list\n");
+    printf("Enter in \".exit\" to exit the program\n");
+}
+
+void chooseWorkingDB(InputBuffer* buffer, Statement* statement, Table** table) {
     while (true) {
-        printf("Enter in \"CREATE TABLE <file-name>\" or \"OPEN <file-name>\" to start\n");
+        printEncourageMsg();
         printPrompt();
         fetchCommand(buffer);
-        if (strncmp(buffer->buffer, "CREATE TABLE", 12) == 0 || strncmp(buffer->buffer, "OPEN", 4) == 0) {
-            switch(constructStatement(buffer, statement)) {
-                
+        if (strncmp(buffer->buffer, "OPEN TABLE", 10) == 0) {
+            if (constructStatement(buffer, statement) != CONSTRUCTION_SUCCESS) {
+                fprintf(stderr, "Failure occured while opening database: %d\n", errno);
+                exit(EXIT_FAILURE);
+            }
+            if (executeOpenTable(statement, table) == EXECUTE_SUCCESS) {
+                printf("Table opened successfully.\n");
+                return;
+            } else {
+                fprintf(stderr, "Failed to open table.\n");
+                exit(EXIT_FAILURE);
             }
         }
         else if (strncmp(buffer->buffer, ".exit", 5) == 0) {
@@ -38,7 +50,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc == 1) {
-        
+        chooseWorkingDB(input, &statement, &table);
     }
     else if (argc == 2) {
         char* fileHandle = argv[1];
