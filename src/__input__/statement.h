@@ -14,7 +14,7 @@ typedef enum {
 } StatementStatus;
 
 typedef enum {
-    STATEMENT_INSERT, STATEMENT_SELECT, STATEMENT_UPDATE, STATEMENT_ALIGN, STATEMENT_DELETE, STATEMENT_DROP
+    STATEMENT_INSERT, STATEMENT_SELECT, STATEMENT_UPDATE, STATEMENT_ALIGN, STATEMENT_DELETE, STATEMENT_DROP, STATEMENT_CREATE_TABLE, STATEMENT_OPEN
 } StatementType;
 
 typedef enum {
@@ -40,6 +40,8 @@ StatementStatus constructDelete(InputBuffer* buffer, Statement* statement);
 StatementStatus constructUpdate(InputBuffer* buffer, Statement* statement);
 StatementStatus constructAlign(InputBuffer* buffer, Statement* statement);
 StatementStatus constructDrop(Statement* statement);
+StatementStatus constructCreateTable(InputBuffer* buffer, Statement* statement);
+StatementStatus constructOpen(InputBuffer* buffer, Statement* statement);
 ExecuteStatus executeStatement(Statement* statement, Table* table);
 ExecuteStatus executeInsert(Statement* statement, Table* table);
 ExecuteStatus executeSelect(Statement* statement, Table* table);
@@ -47,5 +49,7 @@ ExecuteStatus executeDelete(Statement* statement, Table* table);
 ExecuteStatus executeUpdate(Statement* statement, Table* table);
 ExecuteStatus executeAlign(Statement* statement, Table* table);
 ExecuteStatus executeDrop(Statement* statement, Table* table);
+ExecuteStatus executeCreateTable(Statement* statement, Table* table);
+ExecuteStatus executeOpen(Statement* statement, Table* table);
 
 #endif

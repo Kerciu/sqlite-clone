@@ -3,21 +3,50 @@
 #include "__input__/statement.h"
 #include "db/database.h"
 
+void printUsage(const char* programName) {
+    fprintf(stderr, "Usage: %s [<file-name>]\n", programName);
+    fprintf(stderr, " - No arguments: Need to use \"CREATE TABLE <file-name>\" or OPEN \"<file-name>\"\n");
+    fprintf(stderr, " - <file-name>: Use the specified file as the database\n");
+}
+
+void chooseWorkingDB(InputBuffer* buffer, Statement* statement, Table* table) {
+    printf("Enter in \"CREATE TABLE <file-name>\" or \"OPEN <file-name>\" to start\n");
+    fetchCommand(buffer);
+    while (true) {
+        printf("Enter in \"CREATE TABLE <file-name>\" or \"OPEN <file-name>\" to start\n");
+        printPrompt();
+        fetchCommand(buffer);
+        if (strncmp(buffer->buffer, "CREATE TABLE", 12) == 0 || strncmp(buffer->buffer, "OPEN", 4) == 0) {
+            switch(constructStatement(buffer, statement)) {
+                
+            }
+        }
+        else if (strncmp(buffer->buffer, ".exit", 5) == 0) {
+            exit(EXIT_SUCCESS);
+        }
+        else continue;
+    }
+}
+
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        fprintf(stderr, "You must enter a file name!\n");
+    Statement statement;
+    Table* table = NULL;
+    InputBuffer* input = createInputBuffer();
+    if (input == NULL) {
+        fprintf(stderr, "Failed to allocate memory..\n");
         exit(EXIT_FAILURE);
     }
 
-    char* fileHandle = argv[1];
-    Table* table = openDataBase(fileHandle);
-
-    InputBuffer* input = createInputBuffer();
-    if (input == NULL || table == NULL) {
-        if (table) closeDataBase(table);
-        if (input) free(input);
-        fprintf(stderr, "Failed to allocate memory..\n");
-        return -1;
+    if (argc == 1) {
+        
+    }
+    else if (argc == 2) {
+        char* fileHandle = argv[1];
+        Table* table = openDataBase(fileHandle);
+    }
+    else {
+        printUsage(argv[0]);
+        exit(EXIT_FAILURE);
     }
 
     while (true) {
@@ -35,7 +64,6 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        Statement statement;
         switch (constructStatement(input, &statement)) {
             case CONSTRUCTION_SUCCESS:
                 break;
