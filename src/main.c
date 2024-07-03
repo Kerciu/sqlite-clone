@@ -9,24 +9,23 @@ void printUsage(const char* programName) {
     fprintf(stderr, " - <file-name>: Use the specified file as the database\n");
 }
 
-void printEncourageMsg(void) {
+void printGuidingMsg(void) {
     printf("Enter in \"OPEN TABLE <file-name>\" to create or open table\n");
+    printf("Enter in \"DROP <file-name>\" to delete table\n");
     printf("Enter in \"HELP\" for command list\n");
     printf("Enter in \".exit\" to exit the program\n");
 }
 
 void chooseWorkingDB(InputBuffer* buffer, Statement* statement, Table** table) {
     while (true) {
-        printEncourageMsg();
         printPrompt();
         fetchCommand(buffer);
-        if (strncmp(buffer->buffer, "OPEN TABLE", 10) == 0) {
+        if (strncmp(buffer->buffer, "OPEN TABLE", 10) == 0) { 
             if (constructStatement(buffer, statement) != CONSTRUCTION_SUCCESS) {
-                fprintf(stderr, "Failure occured while opening database: %d\n", errno);
+                fprintf(stderr, "Failure occured while opening table: %d\n", errno);
                 exit(EXIT_FAILURE);
             }
             if (executeOpenTable(statement, table) == EXECUTE_SUCCESS) {
-                printf("Table opened successfully.\n");
                 return;
             } else {
                 fprintf(stderr, "Failed to open table.\n");
@@ -36,11 +35,28 @@ void chooseWorkingDB(InputBuffer* buffer, Statement* statement, Table** table) {
         else if (strncmp(buffer->buffer, ".exit", 5) == 0) {
             exit(EXIT_SUCCESS);
         }
-        else continue;
+        else if (strncmp(buffer->buffer, "HELP", 4) == 0) {
+            if (constructHelp(buffer, statement) != CONSTRUCTION_SUCCESS) {
+                fprintf(stderr, "Failure while opening help manual: %d\n", errno);
+                exit(EXIT_FAILURE);
+            }
+            if (executeHelp(statement) == EXECUTE_SUCCESS) {
+                continue;
+            } else {
+                fprintf(stderr, "Failed to execute help manual.\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+        else {
+            printGuidingMsg();
+            continue;
+        }
     }
 }
 
 int main(int argc, char* argv[]) {
+    printf("Welcome to KacperSQL!\n");
+
     Statement statement;
     Table* table = NULL;
     InputBuffer* input = createInputBuffer();
@@ -91,6 +107,12 @@ int main(int argc, char* argv[]) {
             case CONSTRUCTION_SYNTAX_ERROR:
                 fprintf(stderr, "Syntax error. Could not parse statement\n");
                 continue;
+            case CONSTRUCTION_FAILURE_WRONG_BONDS:
+                fprintf(stderr, "Error: cannot align table with given bonds\n");
+                continue;
+            case CONSTRUCTION_FAILURE_NO_FILENAME:
+                fprintf(stderr, "Error: no file name given");
+                continue;
         }
 
         switch(executeStatement(&statement, table)) {
@@ -114,6 +136,10 @@ int main(int argc, char* argv[]) {
                 break;
             case EXECUTE_DROP_FAILURE:
                 fprintf(stderr, "Failed to drop the data base \"%s\"\n", table->fileHandle);
+                break;
+            case EXECUTE_TABLE_CREATION_FAILURE:
+                fprintf(stderr, "Failed to create table\n");
+                break;
         }
     }
 
