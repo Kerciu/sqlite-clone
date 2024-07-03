@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
     }
     else if (argc == 2) {
         char* fileHandle = argv[1];
-        Table* table = openDataBase(fileHandle);
+        table = openDataBase(fileHandle);
     }
     else {
         printUsage(argv[0]);
