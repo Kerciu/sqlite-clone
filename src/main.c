@@ -97,6 +97,9 @@ int main(int argc, char* argv[]) {
             case EXECUTE_SUCCESS:
                 printf("Executed properly :)\n");
                 break;
+            case EXECUTE_SUCCESS_NO_RECORDS:
+                printf("Table has no records yet\n");
+                break;
             case EXECUTE_TABLE_FULL:
                 fprintf(stderr, "Error. Full table\n");
                 break;
