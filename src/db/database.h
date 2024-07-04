@@ -81,6 +81,7 @@ Pager* openPager(const char* fileHandle);
 Cursor* tableStart(Table* table);
 Cursor* tableFind(Table* table, uint32_t key);
 
+uint32_t getTableMaxID(Table* table);
 void displayRow(Row* row);
 void printConstants(void);
 

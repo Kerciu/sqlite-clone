@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <limits.h>
 #include "types.h"
 #include "database.h"
 

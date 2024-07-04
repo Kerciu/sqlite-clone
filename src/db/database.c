@@ -175,6 +175,28 @@ void displayRow(Row* row) {
     printf("(%d %s %s)\n", row->id, row->username, row->email);
 }
 
+uint32_t getTableMaxID(Table* table) {
+    void* node = getPage(table->pager, table->rootPageNum);
+    uint32_t numCells = *leafNodeNumCells(node);
+    uint32_t maxID = 0;
+
+    if (numCells == 0) {
+        return 0;
+    }
+
+    Cursor* cursor = tableStart(table);
+
+    Row row;
+    while (!cursor->endOfTable) {
+        deserializeRow(cursorValue(cursor), &row);
+        if (row.id > maxID) { maxID = row.id; }
+        cursorAdvance(cursor);
+    }
+
+    free(cursor);
+    return maxID;
+}
+
 Pager* openPager(const char* fileHandle) {
     int fileDescript = open(fileHandle, O_RDWR | O_CREAT, S_IWUSR | S_IRUSR);
     if (fileDescript == -1) {

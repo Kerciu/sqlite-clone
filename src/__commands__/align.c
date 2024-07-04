@@ -42,7 +42,7 @@ StatementStatus constructAlign(InputBuffer* buffer, Statement* statement) {
     }
 
 
-    if (strcmp(argOne, "END") == 0) {
+    if (strcmp(argOne, "FROM") == 0) {
         align.type = ALIGN_END_TO;
         
         if (validateBound(argTwo) == BOUND_CREATION_SUCCESS) {
@@ -59,7 +59,7 @@ StatementStatus constructAlign(InputBuffer* buffer, Statement* statement) {
         return CONSTRUCTION_SUCCESS;
     }
 
-    if (strcmp(argOne, "START") == 0) {
+    if (strcmp(argOne, "TO") == 0) {
         align.type = ALIGN_STARTING_FROM;
 
         if (validateBound(argTwo) == BOUND_CREATION_SUCCESS) {
@@ -97,22 +97,32 @@ ExecuteStatus executeAlign(Statement* statement, Table* table) {
     uint32_t start = statement->alignBounds.startIdx;
     uint32_t end = statement->alignBounds.endIdx;
 
-    end = (end == INT_MAX ? getNodeMaxKey(table->pager, node) : end);
+    uint32_t maxID = getTableMaxID(table);
+    printf("Maximum Row ID: %u\n", maxID);
+    end = (end == INT_MAX ? maxID : end);
 
-    Row* row;
+    Row row;
     Cursor* cursor = tableFind(table, start);
+    printf("Starting ALIGN from %d to %d\n", start, end);
     if (cursor->cellNum < numCells) {
         for (uint32_t i = start; i <= end || !cursor->endOfTable; ++i) {
-            deserializeRow(cursorValue(cursor), row);
+            printf("Processing key at position %d\n", cursor->cellNum);
+            deserializeRow(cursorValue(cursor), &row);
 
-            if (row->id != i && row->id <= end) {
+            printf("Row ID: %d, Expected ID: %d\n", row.id, i);
+            if (row.id != i && row.id <= end) {
+                printf("Updating key at position %d to %d\n", cursor->cellNum, i);
+                row.id = i;
                 *(leafNodeKey(node, cursor->cellNum)) = i;
             }
 
-            serializeRow(row, leafNodeValue(node, cursor->cellNum));
+            printf("Row ID after update: %d\n", row.id);
+            printf("Serializing row at position %d\n", cursor->cellNum);
+            serializeRow(&row, leafNodeValue(node, cursor->cellNum));
             cursorAdvance(cursor);
         }
     }
 
+    printf("Finished ALIGN operation\n");
     return EXECUTE_SUCCESS;
 }

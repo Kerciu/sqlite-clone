@@ -22,6 +22,11 @@ SpecialCommandStatus executeSpecialCommand(InputBuffer* buffer, Table* table) {
         return SPECIAL_EXEC_SUCCESS;
     }
 
+    else if (strcmp(buffer->buffer, ".maxid") == 0) {
+        printf("Table max ID: %d\n", getTableMaxID(table));
+        return SPECIAL_EXEC_SUCCESS;
+    }
+
     else return SPECIAL_EXEC_FAILURE;
 }
 
