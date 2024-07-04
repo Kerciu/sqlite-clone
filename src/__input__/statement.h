@@ -57,6 +57,11 @@ typedef struct {
 
 BoundStatus validateBound(char* bound);
 BoundStatus validateBounds(char* start, char* end);
+bool isNumber(char* prompt);
+StatementStatus parseFromCommand(Statement* statement, char* prompt, char* bound);
+StatementStatus parseToCommand(Statement* statement, char* prompt, char* bound);
+StatementStatus parseFromToCommand(Statement* statement, char* fromString);
+StatementStatus checkIfFromToCommand(Statement* statement, StatementType type, char* prompt);
 SpecialCommandStatus executeSpecialCommand(InputBuffer* buffer, Table* table);
 StatementStatus constructStatement(InputBuffer* buffer, Statement* statement);
 StatementStatus constructInsert(InputBuffer* buffer, Statement* statement);

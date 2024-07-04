@@ -1,6 +1,11 @@
 #include "../__input__/statement.h"
 
 StatementStatus constructAlign(InputBuffer* buffer, Statement* statement) {
+    /*
+    *
+    *   TODO --> MAKE THIS COMMAND USE PARSING.C LIB 
+    * 
+    */
     char* command = strtok(buffer->buffer, " ");
     char* argOne = strtok(NULL, " ");
     char* argTwo = strtok(NULL, " ");
