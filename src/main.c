@@ -140,6 +140,9 @@ int main(int argc, char* argv[]) {
             case EXECUTE_TABLE_CREATION_FAILURE:
                 fprintf(stderr, "Failed to create table\n");
                 break;
+            case EXECUTE_FAILURE_OUT_OF_RANGE:
+                fprintf(stderr, "Failed to align: id out of range\n");
+                break;
         }
     }
 

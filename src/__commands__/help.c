@@ -20,7 +20,7 @@ void printCommandMan(char* commandName) {
         printf("DROP *<file-name>\t* - optional\n");
         printf("Deletes the table with specified file name or clears current working one\n");
     } else if (strcmp(commandName, "ALIGN") == 0) {
-        printf("ALIGN *START <id> / \n\t*END <id> / \n\t*<start-id> *<end-id>\n\t* - optional\n");
+        printf("ALIGN *FROM <id> / \n\t*TO <id> / \n\t*<start-id> *<end-id>\n\t* - optional\n");
         printf("Align ids in whole table if no arguments given or align in specified bounds.\n");
     } else {
         printf("Unrecognized command: %s\n", commandName);
