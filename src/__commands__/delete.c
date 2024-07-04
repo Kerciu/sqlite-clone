@@ -8,6 +8,8 @@ bool isNumber(char* prompt) {
 }
 
 StatementStatus parseFromCommand(Statement* statement, char* prompt, char* bound) {
+    if (!isNumber(bound) || strcmp(prompt, "FROM") != 0) return CONSTRUCTION_SYNTAX_ERROR;
+
     statement->operationBounds.type = OPERATION_STARTING_FROM;
     statement->operationBounds.startIdx = atoi(bound);
     statement->operationBounds.endIdx = INT_MAX;
@@ -21,8 +23,6 @@ StatementStatus parseToCommand(Statement* statement, char* prompt, char* bound) 
     statement->operationBounds.startIdx = 0;
     statement->operationBounds.endIdx = atoi(bound);
     return CONSTRUCTION_SUCCESS;
-
-
 }
 
 StatementStatus parseFromToCommand(Statement* statement, char* fromString) {
@@ -32,23 +32,25 @@ StatementStatus parseFromToCommand(Statement* statement, char* fromString) {
     char* argTwo = strtok(NULL, " ");
 
     if (toCommand == NULL || argTwo == NULL) {
+        /* handle DELETE FROM ## situation */
         if (!isNumber(argOne)) return CONSTRUCTION_SYNTAX_ERROR;
         return parseFromCommand(statement, fromCommand, argOne);
     } 
     else {
         if (!validateBounds(argOne, argTwo) == BOUND_CREATION_FAILURE || strcmp(toCommand, "TO") != 0) {
-            return CONSTRUCTION_SYNTAX_ERROR;
+            return CONSTRUCTION_FAILURE_WRONG_BONDS;
         }
+        /* handle DELETE FROM ## TO ## situation*/
         statement->operationBounds.type = OPERATION_IN_BOUNDS;
         statement->operationBounds.startIdx = atoi(argOne);
         statement->operationBounds.endIdx = atoi(argTwo);
         return CONSTRUCTION_SUCCESS;
-        
-
     }
 }
 
 StatementStatus constructDelete(InputBuffer* buffer, Statement* statement) {
+    Operation bounds;
+    statement->operationBounds = bounds;
     char* command = strtok(buffer->buffer, " ");
     char* prompt = strtok(NULL, "\n");
 

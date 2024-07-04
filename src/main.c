@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
                 fprintf(stderr, "Syntax error. Could not parse statement\n");
                 continue;
             case CONSTRUCTION_FAILURE_WRONG_BONDS:
-                fprintf(stderr, "Error: cannot align table with given bonds\n");
+                fprintf(stderr, "Error: cannot make operations on the table with given bonds\n");
                 continue;
             case CONSTRUCTION_FAILURE_NO_FILENAME:
                 fprintf(stderr, "Error: no file name given");
