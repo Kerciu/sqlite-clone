@@ -9,6 +9,20 @@
 #include "../db/database.h"
 
 typedef enum {
+    OPERATION_IN_BOUNDS, OPERATION_STARTING_FROM, OPERATION_END_TO, OPERATION_SIGNLE_ELEMENT
+} OperationType;
+
+typedef enum {
+    BOUND_CREATION_SUCCESS, BOUND_CREATION_FAILURE
+} BoundStatus;
+
+typedef struct {
+    OperationType type;
+    uint32_t startIdx;
+    uint32_t endIdx;
+} Operation;
+
+typedef enum {
     CONSTRUCTION_SUCCESS, CONSTRUCTION_FAILURE_UNRECOGNIZED, CONSTRUCTION_FAILURE_NEGATIVE_ID,
     CONSTRUCTION_SYNTAX_ERROR, CONSTRUCTION_FAILURE_TOO_LONG, CONSTRUCTION_FAILURE_WRONG_BONDS,
     CONSTRUCTION_FAILURE_NO_FILENAME
@@ -35,11 +49,14 @@ typedef struct {
     StatementType type;
     Row rowToInsert;            // Only to use by insert statement
     Row rowToChange;            // Only to use by update or delete statement
-    Align alignBounds;          // Only to use by align statement
+    Operation operationBounds;          // Only to use by align and delete statement
     char* workingFileName;      // Only to use by open and create statement
     char* commandManual;        // Only to use by help statement
 } Statement;
 
+
+BoundStatus validateBound(char* bound);
+BoundStatus validateBounds(char* start, char* end);
 SpecialCommandStatus executeSpecialCommand(InputBuffer* buffer, Table* table);
 StatementStatus constructStatement(InputBuffer* buffer, Statement* statement);
 StatementStatus constructInsert(InputBuffer* buffer, Statement* statement);
