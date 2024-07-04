@@ -74,6 +74,7 @@ void cursorAdvance(Cursor* cursor);
 
 Table* openDataBase(const char* fileHandle);
 void closeDataBase(Table* table);
+void clearDataBase(Table* table);
 void* getPage(Pager* pager, uint32_t pageNum);
 void pagerFlush(Pager* pager, uint32_t pageNum);
 Pager* openPager(const char* fileHandle);

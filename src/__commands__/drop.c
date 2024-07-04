@@ -6,6 +6,6 @@ StatementStatus constructDrop(InputBuffer* buffer, Statement* statement) {
 }
 
 ExecuteStatus executeDrop(Statement* statement, Table* table) {
-    closeDataBase(table);
-    return (remove(table->fileHandle) == 0 ? EXECUTE_SUCCESS : EXECUTE_DROP_FAILURE);
+    clearDataBase(table);
+    return EXECUTE_SUCCESS;
 }

@@ -152,6 +152,23 @@ void closeDataBase(Table* table) {
     free(table);
 }
 
+void clearDataBase(Table *table)
+{
+    Pager* pager = table->pager;
+    
+    for (uint32_t i = 0; i < TABLE_MAX_PAGES; ++i) {
+        void * page = pager->pages[i];
+        if (page) {
+            free(page);
+            pager->pages[i] = NULL;
+        }
+    }
+
+    pager->numPages = 0;
+    table->rootPageNum = 0;
+    fclose(fopen(table->fileHandle, "w"));
+}
+
 void pagerFlush(Pager* pager, uint32_t pageNum) {
     if (pager->pages[pageNum] == NULL) {
         fprintf(stderr, "Error: trying to flush NULL page\n");
