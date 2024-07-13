@@ -8,11 +8,13 @@ bool isNumber(char* prompt) {
 }
 
 StatementStatus parseFromCommand(Statement* statement, char* prompt, char* bound) {
+    printf("Inside parseFromCommand\n");
     if (!isNumber(bound) || strcmp(prompt, "FROM") != 0) return CONSTRUCTION_SYNTAX_ERROR;
 
     statement->operationBounds.type = OPERATION_STARTING_FROM;
     statement->operationBounds.startIdx = atoi(bound);
     statement->operationBounds.endIdx = INT_MAX;
+    printf("parseFrom:startidx:%d , endIdx:%d\n", statement->operationBounds.startIdx, statement->operationBounds.endIdx);
     return CONSTRUCTION_SUCCESS;
 }
 
@@ -27,23 +29,35 @@ StatementStatus parseToCommand(Statement* statement, char* prompt, char* bound) 
 }
 
 StatementStatus parseFromToCommand(Statement* statement, char* fromString) {
-    char* fromCommand = strtok(fromString, NULL);
+    printf("fromString:%s\n", fromString);
+    char* fromCommand = strtok(fromString, " ");
+    printf("fromCommand:%s\n", fromCommand);
     if (fromCommand == NULL) return CONSTRUCTION_SYNTAX_ERROR;
     char* argOne = strtok(NULL, " ");
     if (argOne == NULL) return CONSTRUCTION_SYNTAX_ERROR;
     char* toCommand = strtok(NULL, " ");
     char* argTwo = strtok(NULL, " ");
 
+    printf("argOne: %s, toCommand: %s, argTwo: %s\n", argOne, toCommand, argTwo);
     if (toCommand == NULL || argTwo == NULL) {
+        printf("handle DELETE FROM ## situation\n");
         /* handle DELETE FROM ## situation */
         if (!isNumber(argOne)) return CONSTRUCTION_SYNTAX_ERROR;
         return parseFromCommand(statement, fromCommand, argOne);
     } 
     else {
-        if (!validateBounds(argOne, argTwo) == BOUND_CREATION_FAILURE || strcmp(toCommand, "TO") != 0) {
+        BoundStatus boundsStatus = validateBounds(argOne, argTwo);
+        if (boundsStatus == BOUND_CREATION_FAILURE) {
+            printf("Error: Invalid bounds provided: %s -> %s\n", argOne, argTwo);
+            return CONSTRUCTION_FAILURE_WRONG_BONDS;
+        } 
+        if (strcmp(toCommand, "TO") != 0) {
+            printf("Error: cannot recognize TO command: %s\n", toCommand);
+            printf("Why are you in this block? argOne: %s, toCommand: %s, argTwo: %s\n", argOne, toCommand, argTwo);
             return CONSTRUCTION_FAILURE_WRONG_BONDS;
         }
         /* handle DELETE FROM ## TO ## situation*/
+        printf("handle DELETE FROM ## TO ## situation\n");
         statement->operationBounds.type = OPERATION_IN_BOUNDS;
         statement->operationBounds.startIdx = atoi(argOne);
         statement->operationBounds.endIdx = atoi(argTwo);
@@ -85,4 +99,5 @@ StatementStatus checkIfFromToCommand(Statement* statement, StatementType type, c
         statement->type = type;
         return parseToCommand(statement, toPrompt, toArg);
     }
+    else return CONSTRUCTION_SYNTAX_ERROR;
 }
