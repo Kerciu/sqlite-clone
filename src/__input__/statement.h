@@ -9,7 +9,7 @@
 #include "../db/database.h"
 
 typedef enum {
-    OPERATION_IN_BOUNDS, OPERATION_STARTING_FROM, OPERATION_END_TO, OPERATION_SIGNLE_ELEMENT
+    OPERATION_IN_BOUNDS, OPERATION_STARTING_FROM, OPERATION_END_TO, OPERATION_SINGLE_ELEMENT
 } OperationType;
 
 typedef enum {
@@ -49,7 +49,7 @@ typedef struct {
     StatementType type;
     Row rowToInsert;            // Only to use by insert statement
     Row rowToChange;            // Only to use by update or delete statement
-    Operation operationBounds;          // Only to use by align and delete statement
+    Operation operationBounds;  // Only to use by align and delete statement
     char* workingFileName;      // Only to use by open and create statement
     char* commandManual;        // Only to use by help statement
 } Statement;

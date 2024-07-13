@@ -214,6 +214,28 @@ uint32_t getTableMaxID(Table* table) {
     return maxID;
 }
 
+uint32_t getTableMinID(Table* table) {
+    void* node = getPage(table->pager, table->rootPageNum);
+    uint32_t numCells = *leafNodeNumCells(node);
+    uint32_t minID = INT_MAX;
+
+    if (numCells == 0) {
+        return 0;
+    }
+
+    Cursor* cursor = tableStart(table);
+
+    Row row;
+    while (!cursor->endOfTable) {
+        deserializeRow(cursorValue(cursor), &row);
+        if (row.id < minID) { minID = row.id; }
+        cursorAdvance(cursor);
+    }
+
+    free(cursor);
+    return minID;
+}
+
 Pager* openPager(const char* fileHandle) {
     int fileDescript = open(fileHandle, O_RDWR | O_CREAT, S_IWUSR | S_IRUSR);
     if (fileDescript == -1) {

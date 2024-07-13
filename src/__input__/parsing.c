@@ -17,6 +17,7 @@ StatementStatus parseFromCommand(Statement* statement, char* prompt, char* bound
 }
 
 StatementStatus parseToCommand(Statement* statement, char* prompt, char* bound) {
+    printf("inside parseToCommand: bound: %s, prompt: %s\n", bound, prompt);
     if (!isNumber(bound) || strcmp(prompt, "TO") != 0) return CONSTRUCTION_SYNTAX_ERROR;
 
     statement->operationBounds.type = OPERATION_END_TO;
@@ -27,7 +28,9 @@ StatementStatus parseToCommand(Statement* statement, char* prompt, char* bound) 
 
 StatementStatus parseFromToCommand(Statement* statement, char* fromString) {
     char* fromCommand = strtok(fromString, NULL);
+    if (fromCommand == NULL) return CONSTRUCTION_SYNTAX_ERROR;
     char* argOne = strtok(NULL, " ");
+    if (argOne == NULL) return CONSTRUCTION_SYNTAX_ERROR;
     char* toCommand = strtok(NULL, " ");
     char* argTwo = strtok(NULL, " ");
 
@@ -57,21 +60,29 @@ StatementStatus checkIfFromToCommand(Statement* statement, StatementType type, c
         }
 
         statement->rowToChange.id = id;
-        statement->operationBounds.type = OPERATION_SIGNLE_ELEMENT;
+        statement->operationBounds.type = OPERATION_SINGLE_ELEMENT;
         statement->operationBounds.startIdx = statement->operationBounds.endIdx = id;
         statement->type = type;
+
+        printf("Start idx: %d, End idx: %d\n", statement->operationBounds.startIdx, statement->operationBounds.endIdx); // DEBUG
         return CONSTRUCTION_SUCCESS;
     }
     else if (strncmp(prompt, "FROM", 4) == 0) {
         /* parse command DELETE FROM ## or DELETE FROM ## TO ## */
+        printf("Recognized FROM statment, prompt: %s\n", prompt);
+        statement->type = type;
         return parseFromToCommand(statement, prompt);
     }
     else if (strncmp(prompt, "TO", 2) == 0) {
         /* parse command DELETE TO ## */
-        char* toPrompt;
+        printf("Recognized TO statement, prompt: %s\n", prompt);
+        char toPrompt[256];  // allocate sufficient space for toPrompt
         strcpy(toPrompt, prompt);
         char* toCommand = strtok(toPrompt, " ");
+        if (toCommand == NULL) return CONSTRUCTION_SYNTAX_ERROR;
         char* toArg = strtok(NULL, " ");
-        return parseToCommand(statement, prompt, toArg);
+        if (toArg == NULL) return CONSTRUCTION_SYNTAX_ERROR;
+        statement->type = type;
+        return parseToCommand(statement, toPrompt, toArg);
     }
 }

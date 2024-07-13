@@ -53,7 +53,8 @@ void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value) {
 void leafNodeDelete(Cursor* cursor) {
     void* node = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t numCells = *leafNodeNumCells(node);
-
+    if (cursor->cellNum >= numCells || numCells == 0) return;
+    
     if (cursor->cellNum < numCells) {
         // fill the gap by shifting cells to the left
         for (uint32_t i = cursor->cellNum; i < numCells - 1; ++i) {
@@ -61,13 +62,6 @@ void leafNodeDelete(Cursor* cursor) {
         }
 
         --(*leafNodeNumCells(node));
-    }
-}
-
-void leafNodeDropAll(Cursor* cursor) {
-    while(!cursor->endOfTable) {
-        leafNodeDelete(cursor);
-        cursorAdvance(cursor);
     }
 }
 
