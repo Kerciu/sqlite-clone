@@ -4,14 +4,13 @@
 #include "db/database.h"
 
 void printUsage(const char* programName) {
-    fprintf(stderr, "Usage: %s [<file-name>]\n", programName);
+    fprintf(stderr, "Usage: %s <file-name>\n", programName);
     fprintf(stderr, " - No arguments: Need to use \"OPEN TABLE <file-name>\"\n");
     fprintf(stderr, " - <file-name>: Use the specified file as the database\n");
 }
 
 void printGuidingMsg(void) {
     printf("Enter in \"OPEN TABLE <file-name>\" to create or open table\n");
-    printf("Enter in \"DROP <file-name>\" to delete table\n");
     printf("Enter in \"HELP\" for command list\n");
     printf("Enter in \".exit\" to exit the program\n");
 }
@@ -87,7 +86,7 @@ int main(int argc, char* argv[]) {
                 case SPECIAL_EXEC_SUCCESS:
                     continue;
                 case SPECIAL_EXEC_FAILURE:
-                    printf("Failed to recognize special command: %s\n", input->buffer);
+                    printf("Error: Failed to recognize special command: %s\n", input->buffer);
                     continue;
             }
         }
@@ -96,52 +95,51 @@ int main(int argc, char* argv[]) {
             case CONSTRUCTION_SUCCESS:
                 break;
             case CONSTRUCTION_FAILURE_UNRECOGNIZED:
-                fprintf(stderr, "Unrecognized keyword at the end: %s\n", input->buffer);
+                fprintf(stderr, "Error: Unrecognized keyword at the end: %s\n", input->buffer);
                 continue;;
             case CONSTRUCTION_FAILURE_NEGATIVE_ID:
-                fprintf(stderr, "Error: id cannot be negative\n");
+                fprintf(stderr, "Error: Id cannot be negative\n");
                 continue;
             case CONSTRUCTION_FAILURE_TOO_LONG:
-                fprintf(stderr, "Error: input string is too long");
+                fprintf(stderr, "Error: Input string is too long");
                 continue;
             case CONSTRUCTION_SYNTAX_ERROR:
-                fprintf(stderr, "Syntax error. Could not parse statement\n");
+                fprintf(stderr, "Error: Syntax error, could not parse statement\n");
                 continue;
             case CONSTRUCTION_FAILURE_WRONG_BONDS:
-                fprintf(stderr, "Error: cannot make operations on the table with given bonds\n");
+                fprintf(stderr, "Error: Cannot perform operations on the table with given bonds\n");
                 continue;
             case CONSTRUCTION_FAILURE_NO_FILENAME:
-                fprintf(stderr, "Error: no file name given");
+                fprintf(stderr, "Error: No file name given");
                 continue;
         }
 
         switch(executeStatement(&statement, table)) {
             case EXECUTE_SUCCESS:
-                printf("Executed properly :)\n");
                 break;
             case EXECUTE_SUCCESS_NO_RECORDS:
-                printf("Table has no records yet\n");
+                printf("Error: Table has no records yet\n");
                 break;
             case EXECUTE_TABLE_FULL:
-                fprintf(stderr, "Error. Full table\n");
+                fprintf(stderr, "Error: Full table\n");
                 break;
             case EXECUTE_DUPLICATE_KEY_FOUND:
                 fprintf(stderr, "Error: Duplicate key\n");
                 break;
             case EXECUTE_FAILURE:
-                fprintf(stderr, "Fatal Error: Execution failure\n");
+                fprintf(stderr, "Error: Execution failure\n");
                 break;
             case EXECUTE_NO_ROW_FOUND:
                 fprintf(stderr, "Error: No such row (of id %d) to change found\n", statement.rowToChange.id);
                 break;
             case EXECUTE_DROP_FAILURE:
-                fprintf(stderr, "Failed to drop the data base \"%s\"\n", table->fileHandle);
+                fprintf(stderr, "Error: Failed to drop the data base \"%s\"\n", table->fileHandle);
                 break;
             case EXECUTE_TABLE_CREATION_FAILURE:
-                fprintf(stderr, "Failed to create table\n");
+                fprintf(stderr, "Error: Failed to create table\n");
                 break;
             case EXECUTE_FAILURE_OUT_OF_RANGE:
-                fprintf(stderr, "Failed to align: id out of range\n");
+                fprintf(stderr, "Error: Failed to align, id out of range\n");
                 break;
         }
     }

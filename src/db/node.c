@@ -30,8 +30,8 @@ void initializeLeafNode(void *node)
 
 void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value) {
     void* node = getPage(cursor->table->pager, cursor->pageNum);
-
     uint32_t numCells = *leafNodeNumCells(node);
+
     if (numCells >= LEAF_NODE_MAX_CELLS) {
         // Node is full
         leafNodeSplitAndInsert(cursor, key, value);
@@ -154,7 +154,7 @@ void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value) {
     /* Create a new node and move half the cells over, insert the new value
     in one of two nodes, then update parent (or create new parent)
     */
-
+    printf("Splitting leaf node...\n");
     void* oldNode = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t oldMax = getNodeMaxKey(cursor->table->pager ,oldNode);
     uint32_t newPageNum = getUnusedPageNum(cursor->table->pager);
@@ -224,8 +224,9 @@ void updateInternalNodeKey(void* node, uint32_t oldKey, uint32_t newKey) {
 }
 
 void internalNodeSplitAndInsert(Table* table, uint32_t parentPageNum, uint32_t childPageNum) {
+    printf("Splitting internal node...\n");
     uint32_t oldPageNum = parentPageNum;
-    void* oldNode = getPage(table->pager, oldPageNum);
+    void* oldNode = getPage(table->pager, parentPageNum);
     uint32_t oldMax = getNodeMaxKey(table->pager, oldNode);
 
     void* child = getPage(table->pager, childPageNum);
@@ -267,7 +268,7 @@ void internalNodeSplitAndInsert(Table* table, uint32_t parentPageNum, uint32_t c
     /* for each key move the key and child to the new node
         until you getto the middle key*/
 
-    for (uint32_t i = INTERNAL_NODE_MAX_CELLS - 1; i > INTERNAL_NODE_MAX_CELLS / 2; ++i) {
+    for (uint32_t i = INTERNAL_NODE_MAX_CELLS - 1; i > INTERNAL_NODE_MAX_CELLS / 2; --i) {
         currentPageNum = *internalNodeChild(oldNode, i);
         currentNode = getPage(table->pager, currentPageNum);
 
@@ -508,7 +509,7 @@ void printTree(Pager *pager, uint32_t pageNum, uint32_t indentationLvl) {
 
         if (numKeys > 0) {
             for (uint32_t i = 0; i < numKeys; ++i) {
-                child = *internalNodeKey(node, i);
+                child = *internalNodeChild(node, i);
                 printTree(pager, child, indentationLvl + 1);
 
                 indentation(indentationLvl + 1);

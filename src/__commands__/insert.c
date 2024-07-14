@@ -51,8 +51,6 @@ ExecuteStatus executeInsert(Statement* statement, Table* table) {
     leafNodeInsert(cursor, rowToInsert->id, rowToInsert);
     free(cursor);
 
-    numCells = *leafNodeNumCells(node);
-
     return EXECUTE_SUCCESS;
 
 }
