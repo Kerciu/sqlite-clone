@@ -1,6 +1,7 @@
 #include "../__input__/statement.h"
 
 void printCommandMan(char* commandName) {
+    printf("Manual:\n");
     if (strcmp(commandName, "INSERT") == 0) {
         printf("INSERT <id> <username> <email>\n");
         printf("Inserts a new row into the table.\n");
@@ -9,7 +10,10 @@ void printCommandMan(char* commandName) {
         printf("Selects all rows from the table.\n");
     } else if (strcmp(commandName, "DELETE") == 0) {
         printf("DELETE <id>\n");
-        printf("Deletes the row with the specified id.\n");
+        printf("DELETE FROM <id>\n");
+        printf("DELETE TO <id>\n");
+        printf("DELETE FROM <id> TO <id>\n");
+        printf("Deletes the row with the specified id or in specified bounds.\n");
     } else if (strcmp(commandName, "UPDATE") == 0) {
         printf("UPDATE <id> <username> <email>\n");
         printf("Updates the row with the specified id.\n");
@@ -20,7 +24,10 @@ void printCommandMan(char* commandName) {
         printf("DROP *<file-name>\t* - optional\n");
         printf("Deletes the table with specified file name or clears current working one\n");
     } else if (strcmp(commandName, "ALIGN") == 0) {
-        printf("ALIGN *FROM <id> / \n\t*TO <id> / \n\t*<start-id> *<end-id>\n\t* - optional\n");
+        printf("ALIGN\n");
+        printf("ALIGN FROM <id>\n");
+        printf("ALIGN TO <id>\n");
+        printf("ALIGN FROM <id> TO <id>\n");
         printf("Align ids in whole table if no arguments given or align in specified bounds.\n");
     } else {
         printf("Unrecognized command: %s\n", commandName);
