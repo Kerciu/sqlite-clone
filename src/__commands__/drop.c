@@ -13,7 +13,6 @@ ExecuteStatus executeDrop(Statement* statement, Table* table) {
     uint32_t start = getTableMinID(table);
     uint32_t end = getTableMaxID(table);
     for (uint32_t i = start; i <= end; ++i) {
-        printf("Start and end values in a while loop: %d and %d\n", i, end);
         Cursor* cursor = tableFind(table, i);
         if (cursor->cellNum < numCells) {
             uint32_t keyAtIdx = *leafNodeKey(node, cursor->cellNum);
