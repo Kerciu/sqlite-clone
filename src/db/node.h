@@ -8,6 +8,7 @@
 #include "database.h"
 
 #define INVALID_PAGE_NUM UINT32_MAX
+#define INVALID_INDEX -1
 
 // https://www.programiz.com/dsa/b-tree
 

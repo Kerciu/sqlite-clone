@@ -71,17 +71,87 @@ void balanceTreeAfterDeletion(Cursor* cursor) {
 }
 
 uint32_t getSiblingPageNum(Cursor* cursor, SiblingSide side) {
+    void* node = getPage(cursor->table->pager, cursor->pageNum);
+    uint32_t parentPageNum = *nodeParent(node);
+    void* parent = getPage(cursor->table->pager, parentPageNum);
 
+    uint32_t idxInParent = getIdxInParent(parent, cursor->pageNum);
+    
+    if (side == SIBLING_LEFT) {
+        if (idxInParent == 0) {
+            return INVALID_PAGE_NUM;
+        }
+        else {
+            return *internalNodeChild(parent, idxInParent - 1);
+        }
+    }
+    else {
+        uint32_t numChildren = *internalNodeNumKeys(parent) + 1;
+        if (idxInParent >= numChildren - 1) {
+            return INVALID_PAGE_NUM;
+        }
+        else {
+            return *internalNodeChild(parent, idxInParent + 1);
+        }
+    }
+}
+
+uint32_t getIdxInParent(void* parent, uint32_t childPageNum) {
+    // find index of child in a parent
+    uint32_t numKeys = *internalNodeNumKeys(parent);
+    for (uint32_t i = 0; i <= numKeys; ++i) {
+        if (*internalNodeChild(parent, i) == childPageNum) {
+            return i;
+        }
+    }
+
+    return INVALID_INDEX;
 }
 
 void rotateKeysFromLeft(Cursor* cursor, void* leftSibling) {
+    void* node = getPage(cursor->table->pager, cursor->pageNum);
+    uint32_t leftNumCells = *leafNodeNumCells(node);
 
+    // move keys to the right in a node
+    for (uint32_t i = *leafNodeNumCells(node); i > 0; --i) {
+        memcpy(leafNodeCell(node, i), leafNodeCell(node, i - 1), LEAF_NODE_CELL_SIZE);
+    }
+
+    // copy last key from left sibling to the current node
+    memcpy(leafNodeCell(node, 0), leafNodeCell(leftSibling, leftNumCells - 1), LEAF_NODE_CELL_SIZE);
+
+    ++(*leafNodeNumCells(node));
+    --(*leafNodeNumCells(leftSibling));
+
+    // update key in the parent
+    uint32_t parentPageNum = *nodeParent(node);
+    void* parent = getPage(cursor->table->pager, parentPageNum);
+    uint32_t idxInParent = getIdxInParent(parent, cursor->pageNum);
+    *internalNodeKey(parent, idxInParent - 1) = *leafNodeKey(node, 0);
 }
 
 void rotateKeysFromRight(Cursor* cursor, void* rightSibling) {
+    void* node = getPage(cursor->table->pager, cursor->pageNum);
+    uint32_t rightNumCells = *leafNodeNumCells(rightSibling);
 
+    // copy first key from the left parent to the current node
+    memcpy(leafNodeCell(node, *leafNodeNumCells(node)), leafNodeCell(rightSibling, 0), LEAF_NODE_CELL_SIZE);
+    ++(*leafNodeNumCells(node));
+
+    // move keys to the left in a right sibling
+    for (uint32_t i = 0; i < rightNumCells - 1; ++i) {
+        memcpy(leafNodeCell(rightSibling, i), leafNodeCell(rightSibling, i + 1), LEAF_NODE_CELL_SIZE);
+    }
+
+    --(*leafNodeNumCells(rightSibling));
+
+    // update key in parent
+    uint32_t parentPageNum = *nodeParent(node);
+    void* parent = getPage(cursor->table->pager, parentPageNum);
+    uint32_t idxInParent = getIdxInParent(parent, cursor->pageNum);
+    *internalNodeKey(parent, idxInParent) = *leafNodeKey(rightSibling, 0);
 }
 
 void leafNodeMerge(Table* table, uint32_t leftPageNum, uint32_t rightPageNum) {
-    
+
 }
