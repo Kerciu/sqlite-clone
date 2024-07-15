@@ -14,6 +14,7 @@
 
 /* Node Header Format*/
 typedef enum { NODE_INTERNAL, NODE_LEAF } NodeType;
+typedef enum { SIBLING_LEFT, SIBLING_RIGHT } SiblingSide;
 
 /* Access Leaf Node Fields */
 
@@ -24,11 +25,19 @@ void* leafNodeValue(void* node, uint32_t cellNum);
 void initializeLeafNode(void* node);
 void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value);
 void leafNodeUpdate(Cursor* cursor, uint32_t key, Row* value);
-void leafNodeDelete(Cursor* cursor);
-void leafNodeDropAll(Cursor* cursor);
 Cursor* leafNodeFind(Table* table, uint32_t pageNum, uint32_t key);
 void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value);
 uint32_t* leafNodeNextLeaf(void* node);
+
+void treeDeleteKey(Table* table, uint32_t key);
+void leafNodeDelete(Cursor* cursor);
+void balanceTreeAfterDeletion(Cursor* cursor);
+uint32_t getSiblingPageNum(Cursor* cursor, SiblingSide side);
+uint32_t getIdxInParent(void* parent, uint32_t childPageNum);
+void rotateKeysFromLeft(Cursor* cursor, void* leftSibling);
+void rotateKeysFromRight(Cursor* cursor, void* rightSibling);
+void leafNodeMerge(Table* table, uint32_t leftPageNum, uint32_t rightPageNum);
+void internalNodeDeleteChild(void* node, uint32_t childPageNum);
 
 void createNewRoot(Table* table, uint32_t newPage);
 bool isNodeRoot(void* node);

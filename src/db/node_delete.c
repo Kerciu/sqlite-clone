@@ -1,9 +1,5 @@
 #include "node.h"
 
-typedef enum {
-    SIBLING_LEFT, SIBLING_RIGHT
-} SiblingSide;
-
 void treeDeleteKey(Table* table, uint32_t key) {
     Cursor* cursor = tableFind(table, key);
     void* node = getPage(cursor->table->pager, cursor->pageNum);
@@ -64,7 +60,7 @@ void balanceTreeAfterDeletion(Cursor* cursor) {
             return;
         }
         else {  // merge with right sibling
-            leafNodeMerge(cursor->table, cursor->pageNum, rightSibling);
+            leafNodeMerge(cursor->table, cursor->pageNum, rightSiblingPageNum);
             return;
         }
     }
@@ -178,5 +174,22 @@ void leafNodeMerge(Table* table, uint32_t leftPageNum, uint32_t rightPageNum) {
 }
 
 void internalNodeDeleteChild(void* node, uint32_t childPageNum) {
+    // find and delete child from internal node
+    uint32_t numKeys = *internalNodeNumKeys(node);
+    uint32_t i;
 
+    for (i = 0; i <= numKeys; ++i) {
+        if (*internalNodeChild(node, i) == childPageNum) break;
+    }
+
+    if (i > numKeys) return;
+
+    for (uint32_t j = i; j < numKeys; ++j) {
+        *internalNodeCell(node, j) = *internalNodeChild(node, j + 1);
+        if (j < numKeys - 1) {
+            *internalNodeKey(node, j) = *internalNodeKey(node, j + 1);
+        }
+    }
+
+    --(*internalNodeNumKeys(node));
 }

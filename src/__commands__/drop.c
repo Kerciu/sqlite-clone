@@ -18,7 +18,7 @@ ExecuteStatus executeDrop(Statement* statement, Table* table) {
             uint32_t keyAtIdx = *leafNodeKey(node, cursor->cellNum);
 
             if (keyAtIdx == i) {
-                leafNodeDelete(cursor);
+                treeDeleteKey(table, i);
             }
             else continue;
         }

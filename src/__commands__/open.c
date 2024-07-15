@@ -17,6 +17,7 @@ StatementStatus constructOpenTable(InputBuffer* buffer, Statement* statement) {
 }
 
 ExecuteStatus executeOpenTable(Statement* statement, Table** table) {
+    /* TODO make this switch databases while using program */
     *table = openDataBase(statement->workingFileName);
     if (*table == NULL) {
         return EXECUTE_TABLE_CREATION_FAILURE;
