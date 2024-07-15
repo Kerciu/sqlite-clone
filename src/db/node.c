@@ -50,21 +50,6 @@ void leafNodeInsert(Cursor* cursor, uint32_t key, Row* value) {
     serializeRow(value, leafNodeValue(node, cursor->cellNum));
 }
 
-void leafNodeDelete(Cursor* cursor) {
-    void* node = getPage(cursor->table->pager, cursor->pageNum);
-    uint32_t numCells = *leafNodeNumCells(node);
-    if (cursor->cellNum >= numCells || numCells == 0) return;
-    
-    if (cursor->cellNum < numCells) {
-        // fill the gap by shifting cells to the left
-        for (uint32_t i = cursor->cellNum; i < numCells - 1; ++i) {
-            memcpy(leafNodeCell(node, i), leafNodeCell(node, i + 1), LEAF_NODE_CELL_SIZE);
-        }
-
-        --(*leafNodeNumCells(node));
-    }
-}
-
 void leafNodeUpdate(Cursor* cursor, uint32_t key, Row* value) {
     void* node = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t numCells = *leafNodeNumCells(node);

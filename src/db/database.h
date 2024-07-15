@@ -48,6 +48,7 @@ extern const uint32_t LEAF_NODE_VALUE_OFFSET;
 extern const uint32_t LEAF_NODE_CELL_SIZE;
 extern const uint32_t LEAF_NODE_SPACE_FOR_CELLS;
 extern const uint32_t LEAF_NODE_MAX_CELLS;
+extern const uint32_t LEAF_NODE_MIN_CELLS;
 
 /* Leaf node sizes */
 extern const uint32_t LEAF_NODE_RIGHT_SPLIT_COUNT;
