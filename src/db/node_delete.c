@@ -153,5 +153,30 @@ void rotateKeysFromRight(Cursor* cursor, void* rightSibling) {
 }
 
 void leafNodeMerge(Table* table, uint32_t leftPageNum, uint32_t rightPageNum) {
+    void* leftNode = getPage(table->pager, leftPageNum);
+    void* rightNode = getPage(table->pager, rightPageNum);
+
+    uint32_t leftNumCells = *leafNodeNumCells(leftNode);
+    uint32_t rightNumCells = *leafNodeNumCells(rightNode);
+
+    // move all keys from right node to the left node
+    for (uint32_t i = 0; i < rightNumCells; ++i) {
+        void* dest = leafNodeCell(leftNode, leftNumCells + i);
+        void* src = leafNodeCell(rightNode, i);
+        memcpy(dest, src, LEAF_NODE_CELL_SIZE);
+    }
+
+    *leafNodeNumCells(leftNode) += rightNumCells;
+    *leafNodeNextLeaf(leftNode) = *leafNodeNextLeaf(rightNode);     // update pointers
+
+    uint32_t parentPageNum = *nodeParent(leftNode);
+    void* parent = getPage(table->pager, parentPageNum);
+    internalNodeDeleteChild(parent, rightPageNum);
+
+    // update the parent
+    updateInternalNodeKey(parent, getNodeMaxKey(table->pager, leftNode), getNodeMaxKey(table->pager, rightNode));
+}
+
+void internalNodeDeleteChild(void* node, uint32_t childPageNum) {
 
 }
