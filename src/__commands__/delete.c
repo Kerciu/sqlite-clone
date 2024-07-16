@@ -58,42 +58,45 @@ ExecuteStatus executeDelete(Statement* statement, Table* table) {
             return EXECUTE_FAILURE;
         }
     }  else {
-        uint32_t* startPtr = &(statement->operationBounds.startIdx);
-        *startPtr = (*startPtr >= getTableMinID(table) ? *startPtr : getTableMinID(table));
-        Cursor* startCursor = tableFind(table, *startPtr);
-        printf("executeDelete: startCursor cell num: %u, startCursor page num: %u\n", startCursor->cellNum, startCursor->pageNum);
+        // uint32_t* startPtr = &(statement->operationBounds.startIdx);
+        // *startPtr = (*startPtr >= getTableMinID(table) ? *startPtr : getTableMinID(table));
+        // Cursor* startCursor = tableFind(table, *startPtr);
+        // printf("executeDelete: startCursor cell num: %u, startCursor page num: %u\n", startCursor->cellNum, startCursor->pageNum);
 
-        uint32_t* endPtr = &(statement->operationBounds.endIdx);
-        *endPtr = (*endPtr <= getTableMaxID(table) ? *endPtr : getTableMaxID(table));
-        Cursor* endCursor = tableFind(table, *endPtr);
-        printf("executeDelete: endCursor cell num: %u, endCursor page num: %u\n", endCursor->cellNum, endCursor->pageNum);
+        // uint32_t* endPtr = &(statement->operationBounds.endIdx);
+        // *endPtr = (*endPtr <= getTableMaxID(table) ? *endPtr : getTableMaxID(table));
+        // Cursor* endCursor = tableFind(table, *endPtr);
+        // printf("executeDelete: endCursor cell num: %u, endCursor page num: %u\n", endCursor->cellNum, endCursor->pageNum);
 
-        node = getPage(startCursor->table->pager, startCursor->pageNum);
-        numCells = *leafNodeNumCells(node);
+        // node = getPage(startCursor->table->pager, startCursor->pageNum);
+        // numCells = *leafNodeNumCells(node);
 
-        if (startCursor->cellNum < numCells && endCursor->cellNum < numCells) {
-            for (uint32_t i = *startPtr; i <= *endPtr; ++i) {
-                Cursor* cursor = tableFind(table, i);
-                if (cursor->cellNum < numCells) {
-                    uint32_t keyAtIdx = *leafNodeKey(node, cursor->cellNum);
+        // if (startCursor->cellNum < numCells && endCursor->cellNum < numCells) {
+        //     for (uint32_t i = *startPtr; i <= *endPtr; ++i) {
+        //         Cursor* cursor = tableFind(table, i);
+        //         if (cursor->cellNum < numCells) {
+        //             uint32_t keyAtIdx = *leafNodeKey(node, cursor->cellNum);
 
-                    if (keyAtIdx == i) {
-                        treeDeleteKey(table, i);
-                    } else {
-                        continue;
-                    }
-                } else {
-                    return EXECUTE_FAILURE;
-                }
-            }
+        //             if (keyAtIdx == i) {
+        //                 treeDeleteKey(table, i);
+        //             } else {
+        //                 continue;
+        //             }
+        //         } else {
+        //             return EXECUTE_FAILURE;
+        //         }
+        //     }
 
-            free(startCursor);
-            free(endCursor);
-            return EXECUTE_SUCCESS;
-        } else {
-            free(startCursor);
-            free(endCursor);
-            return EXECUTE_FAILURE;
-        }
+        //     free(startCursor);
+        //     free(endCursor);
+        //     return EXECUTE_SUCCESS;
+        // } else {
+        //     free(startCursor);
+        //     free(endCursor);
+        //     return EXECUTE_FAILURE;
+        // }
+
+        printf("Not implemented yet\n");
+        return EXECUTE_FAILURE;
     }
 }

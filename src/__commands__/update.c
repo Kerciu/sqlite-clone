@@ -30,12 +30,12 @@ StatementStatus constructUpdate(InputBuffer* buffer, Statement* statement) {
 }
 
 ExecuteStatus executeUpdate(Statement* statement, Table* table) {
-    void* node = getPage(table->pager, table->rootPageNum);
-    uint32_t numCells = *leafNodeNumCells(node);
-
     Row* rowToUpdate = &(statement->rowToChange);
     uint32_t keyToUpdate = rowToUpdate->id;
     Cursor* cursor = tableFind(table, keyToUpdate);
+
+    void* node = getPage(cursor->table->pager, cursor->pageNum);
+    uint32_t numCells = *leafNodeNumCells(node);
     
     if (cursor->cellNum < numCells) {
         uint32_t keyAtIdx = *leafNodeKey(node, cursor->cellNum);
