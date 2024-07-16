@@ -1,53 +1,5 @@
 #include "database.h"
 
-const uint32_t ID_SIZE = sizeOFAttribute(Row, id);
-const uint32_t USERNAME_SIZE = sizeOFAttribute(Row, username);
-const uint32_t EMAIL_SIZE = sizeOFAttribute(Row, email);
-const uint32_t ID_OFFSET = 0;
-const uint32_t USERNAME_OFFSET = ID_OFFSET + ID_SIZE;
-const uint32_t EMAIL_OFFSET = USERNAME_OFFSET + USERNAME_SIZE;
-const uint32_t ROW_SIZE = ID_SIZE + USERNAME_SIZE + EMAIL_SIZE;
-const uint32_t PAGE_SIZE = 4096;
-
-const uint32_t NODE_TYPE_SIZE = sizeof(uint8_t);
-const uint32_t NODE_TYPE_OFFSET = 0;
-const uint32_t IS_ROOT_SIZE = sizeof(uint8_t);
-const uint32_t IS_ROOT_OFFSET = NODE_TYPE_SIZE;
-const uint32_t PARENT_POINTER_SIZE = sizeof(uint32_t);
-const uint32_t PARENT_POINTER_OFFSET = IS_ROOT_OFFSET + IS_ROOT_SIZE;
-const uint8_t COMMON_NODE_HEADER_SIZE = NODE_TYPE_SIZE + IS_ROOT_SIZE + PARENT_POINTER_SIZE;
-
-const uint32_t LEAF_NODE_NUM_CELLS_SIZE = sizeof(uint32_t);
-const uint32_t LEAF_NODE_NUM_CELLS_OFFSET = COMMON_NODE_HEADER_SIZE;
-const uint32_t LEAF_NODE_NEXT_LEAF_SIZE = sizeof(uint32_t);
-const uint32_t LEAF_NODE_NEXT_LEAF_OFFSET = LEAF_NODE_NUM_CELLS_OFFSET + LEAF_NODE_NUM_CELLS_SIZE;
-const uint32_t LEAF_NODE_HEADER_SIZE = COMMON_NODE_HEADER_SIZE + LEAF_NODE_NUM_CELLS_SIZE + LEAF_NODE_NEXT_LEAF_SIZE;
-
-const uint32_t LEAF_NODE_KEY_SIZE = sizeof(uint32_t);
-const uint32_t LEAF_NODE_KEY_OFFSET = 0;
-const uint32_t LEAF_NODE_VALUE_SIZE = ROW_SIZE;
-const uint32_t LEAF_NODE_VALUE_OFFSET = LEAF_NODE_KEY_OFFSET + LEAF_NODE_KEY_SIZE;
-
-const uint32_t LEAF_NODE_CELL_SIZE = LEAF_NODE_KEY_SIZE + LEAF_NODE_VALUE_SIZE;
-const uint32_t LEAF_NODE_SPACE_FOR_CELLS = PAGE_SIZE - LEAF_NODE_HEADER_SIZE;
-const uint32_t LEAF_NODE_MAX_CELLS = LEAF_NODE_SPACE_FOR_CELLS / LEAF_NODE_CELL_SIZE;
-const uint32_t LEAF_NODE_MIN_CELLS = (LEAF_NODE_MAX_CELLS / 2) - 1;
-
-const uint32_t LEAF_NODE_RIGHT_SPLIT_COUNT = (LEAF_NODE_MAX_CELLS + 1) / 2;
-const uint32_t LEAF_NODE_LEFT_SPLIT_COUNT = (LEAF_NODE_MAX_CELLS + 1) - LEAF_NODE_RIGHT_SPLIT_COUNT;
-
-const uint32_t INTERNAL_NODE_NUM_KEYS_SIZE = sizeof(uint32_t);
-const uint32_t INTERNAL_NODE_NUM_KEYS_OFFSET = COMMON_NODE_HEADER_SIZE;
-const uint32_t INTERNAL_NODE_RIGHT_CHILD_SIZE = sizeof(uint32_t);
-const uint32_t INTERNAL_NODE_RIGHT_CHILD_OFFSET = INTERNAL_NODE_NUM_KEYS_OFFSET + INTERNAL_NODE_NUM_KEYS_SIZE;
-const uint32_t INTERNAL_NODE_HEADER_SIZE = COMMON_NODE_HEADER_SIZE + INTERNAL_NODE_NUM_KEYS_SIZE + INTERNAL_NODE_RIGHT_CHILD_SIZE;
-
-const uint32_t INTERNAL_NODE_KEY_SIZE = sizeof(uint32_t);
-const uint32_t INTERNAL_NODE_CHILD_SIZE = sizeof(uint32_t);
-const uint32_t INTERNAL_NODE_CELL_SIZE = INTERNAL_NODE_CHILD_SIZE + INTERNAL_NODE_KEY_SIZE;
-
-const uint32_t INTERNAL_NODE_MAX_CELLS = 3;
-
 void serializeRow(Row *source, void *destination)
 {
     memcpy(destination + ID_OFFSET, &(source->id), ID_SIZE);
@@ -315,13 +267,4 @@ void cursorAdvance(Cursor* cursor) {
             cursor->cellNum = 0;
         }
     }
-}
-
-void printConstants(void) {
-  printf("ROW_SIZE: %d\n", ROW_SIZE);
-  printf("COMMON_NODE_HEADER_SIZE: %d\n", COMMON_NODE_HEADER_SIZE);
-  printf("LEAF_NODE_HEADER_SIZE: %d\n", LEAF_NODE_HEADER_SIZE);
-  printf("LEAF_NODE_CELL_SIZE: %d\n", LEAF_NODE_CELL_SIZE);
-  printf("LEAF_NODE_SPACE_FOR_CELLS: %d\n", LEAF_NODE_SPACE_FOR_CELLS);
-  printf("LEAF_NODE_MAX_CELLS: %d\n", LEAF_NODE_MAX_CELLS);
 }
