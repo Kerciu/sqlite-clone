@@ -18,7 +18,6 @@ ExecuteStatus executeSelect(Statement* statement, Table* table) {
     Row row;
     while (!cursor->endOfTable) {
         deserializeRow(cursorValue(cursor), &row);
-        printf("Cursor cell num: %d, Cursor page num: %d\n", cursor->cellNum, cursor->pageNum);
         displayRow(&row);
         cursorAdvance(cursor);
     }

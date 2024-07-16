@@ -10,14 +10,12 @@ StatementStatus constructDelete(InputBuffer* buffer, Statement* statement) {
         return CONSTRUCTION_SYNTAX_ERROR;
     }
 
-    printf("constructDelete: command = %s, prompt = %s\n", command, prompt);
     return checkIfFromToCommand(statement, STATEMENT_DELETE, prompt);
 }
 
 ExecuteStatus executeDelete(Statement* statement, Table* table) {
     StatementType type = statement->operationBounds.type;
     bool boundedOperation = (type == OPERATION_IN_BOUNDS || type == OPERATION_STARTING_FROM || type == OPERATION_END_TO);
-    printf("executeDelete: StatementType = %d\n", type);
 
     void* node;
     uint32_t numCells;
@@ -27,34 +25,23 @@ ExecuteStatus executeDelete(Statement* statement, Table* table) {
         uint32_t keyToDelete = rowToDelete->id;
         Cursor* cursor = tableFind(table, keyToDelete);
         if (cursor == NULL) {
-            printf("executeDelete: Error, cursor for key %u is NULL\n", keyToDelete);
             return EXECUTE_FAILURE;
         }
 
         node = getPage(cursor->table->pager, cursor->pageNum);
         numCells = *leafNodeNumCells(node);
-        printf("executeDelete: KeyToDelete: %u, cursor cell num: %u, cursor page num: %u\n", keyToDelete, cursor->cellNum, cursor->pageNum);
-        
-        // Print node keys for debugging
-        printf("executeDelete: Node keys at page %u:\n", cursor->pageNum);
-        for (uint32_t i = 0; i < numCells; ++i) {
-            printf("Key at cell %u: %u\n", i, *leafNodeKey(node, i));
-        }
 
         if (cursor->cellNum < numCells) {
             uint32_t keyAtIdx = *leafNodeKey(node, cursor->cellNum);
-            printf("executeDelete: KeyAtIdx: %u\n", keyAtIdx);
 
             if (keyAtIdx == keyToDelete) {
                 treeDeleteKey(table, keyToDelete);
                 free(cursor);
                 return EXECUTE_SUCCESS;
             } else {
-                printf("Error: No such row (of id %u) to change found\n", keyToDelete);
                 return EXECUTE_NO_ROW_FOUND;
             }
         } else {
-            printf("Error: cursor->cellNum (%u) >= numCells (%u)\n", cursor->cellNum, numCells);
             return EXECUTE_FAILURE;
         }
     }  else {

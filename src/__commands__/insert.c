@@ -40,12 +40,9 @@ ExecuteStatus executeInsert(Statement* statement, Table* table) {
 
     void* node = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t numCells = (*leafNodeNumCells(node));
-    printf("executeInsert: numCells: %d\n", numCells);
-
-    printf("executeInsert: cursor->cellNum: %d, keyToInsert: %d\n", cursor->cellNum, keyToInsert);
+    
     if (cursor->cellNum < numCells) {
         uint32_t keyAtIndex = *leafNodeKey(node, cursor->cellNum);
-        printf("executeInsert: keyAtIndex: %d\n", keyAtIndex);
         if (keyAtIndex == keyToInsert) {
             return EXECUTE_DUPLICATE_KEY_FOUND;
         }
