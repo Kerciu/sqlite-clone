@@ -7,7 +7,10 @@ void printCommandMan(char* commandName) {
         printf("Inserts a new row into the table.\n");
     } else if (strcmp(commandName, "SELECT") == 0) {
         printf("SELECT\n");
-        printf("Selects all rows from the table.\n");
+        printf("SELECT FROM <id>\n");
+        printf("SELECT TO <id>\n");
+        printf("SELECT FROM <id> TO <id>\n");
+        printf("Selects all rows from the table if no arguments given or selects in specified bounds.\n");
     } else if (strcmp(commandName, "DELETE") == 0) {
         printf("DELETE <id>\n");
         printf("DELETE FROM <id>\n");
