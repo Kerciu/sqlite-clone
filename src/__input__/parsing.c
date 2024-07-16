@@ -10,7 +10,7 @@ bool isNumber(char* prompt) {
 StatementStatus parseFromCommand(Statement* statement, char* prompt, char* bound) {
     if (!isNumber(bound) || strcmp(prompt, "FROM") != 0) return CONSTRUCTION_SYNTAX_ERROR;
 
-    statement->operationBounds.type = OPERATION_STARTING_FROM;
+    statement->operationBounds.type = OPERATION_IN_BOUNDS;
     statement->operationBounds.startIdx = atoi(bound);
     statement->operationBounds.endIdx = INT_MAX;
     return CONSTRUCTION_SUCCESS;
@@ -19,7 +19,7 @@ StatementStatus parseFromCommand(Statement* statement, char* prompt, char* bound
 StatementStatus parseToCommand(Statement* statement, char* prompt, char* bound) {
     if (!isNumber(bound) || strcmp(prompt, "TO") != 0) return CONSTRUCTION_SYNTAX_ERROR;
 
-    statement->operationBounds.type = OPERATION_END_TO;
+    statement->operationBounds.type = OPERATION_IN_BOUNDS;
     statement->operationBounds.startIdx = 0;
     statement->operationBounds.endIdx = atoi(bound);
     return CONSTRUCTION_SUCCESS;
@@ -55,7 +55,7 @@ StatementStatus parseFromToCommand(Statement* statement, char* fromString) {
 }
 
 StatementStatus checkIfFromToCommand(Statement* statement, StatementType type, char* prompt) {
-    if (isNumber(prompt) && type == STATEMENT_DELETE) {
+    if (isNumber(prompt) && !(type == STATEMENT_ALIGN)) {
         /* parse command DELETE ## (for single id deletion)*/
         uint32_t id = atoi(prompt);
         if (id < 0 || id > INT_MAX) {
@@ -86,5 +86,7 @@ StatementStatus checkIfFromToCommand(Statement* statement, StatementType type, c
         return parseToCommand(statement, toPrompt, toArg);
     }
     
-    else return CONSTRUCTION_SYNTAX_ERROR;
+    else {
+        return CONSTRUCTION_SYNTAX_ERROR;
+    }
 }

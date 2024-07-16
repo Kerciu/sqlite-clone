@@ -7,7 +7,7 @@ StatementStatus constructAlign(InputBuffer* buffer, Statement* statement) {
     if (prompt == NULL) {
         statement->operationBounds.startIdx = 0;
         statement->operationBounds.endIdx = INT_MAX;
-        statement->operationBounds.type = OPERATION_IN_BOUNDS;
+        statement->operationBounds.type = OPERATION_EVERY_ELEMENT;
         statement->type = STATEMENT_ALIGN;
         return CONSTRUCTION_SUCCESS;
     }

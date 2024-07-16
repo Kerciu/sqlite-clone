@@ -15,7 +15,7 @@ StatementStatus constructDelete(InputBuffer* buffer, Statement* statement) {
 
 ExecuteStatus executeDelete(Statement* statement, Table* table) {
     StatementType type = statement->operationBounds.type;
-    bool boundedOperation = (type == OPERATION_IN_BOUNDS || type == OPERATION_STARTING_FROM || type == OPERATION_END_TO);
+    bool boundedOperation = (type == OPERATION_IN_BOUNDS || type == OPERATION_EVERY_ELEMENT);
 
     void* node;
     uint32_t numCells;
