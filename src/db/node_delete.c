@@ -2,34 +2,62 @@
 
 void treeDeleteKey(Table* table, uint32_t key) {
     Cursor* cursor = tableFind(table, key);
+    if (cursor == NULL) {
+        printf("treeDeleteKey: Error, cursor for key %u is NULL\n", key);
+        return;
+    }
+    printf("treeDeleteKey: Found cursor for key %u, cursor cell num: %u, cursor page num: %u\n", key, cursor->cellNum, cursor->pageNum);
+
+    if (cursor->pageNum >= table->pager->numPages) {
+        printf("treeDeleteKey: Error, Page number %u out of bounds (%u)\n", cursor->pageNum, table->pager->numPages);
+        free(cursor);
+        return;
+    }
+
     void* node = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t numCells = *leafNodeNumCells(node);
+    printf("treeDeleteKey: numCells in node = %u\n", numCells);
 
-    if (cursor->cellNum >= numCells) return;    // key not found
+    if (cursor->cellNum >= numCells) {
+        printf("treeDeleteKey: Error, Cell number %u out of bounds (%u)\n", cursor->cellNum, numCells);
+        free(cursor);
+        return;
+    }
 
     uint32_t keyAtIdx = *leafNodeKey(node, cursor->cellNum);
-    if (keyAtIdx != key) return;    // key not found
-
+    if (keyAtIdx != key) {
+        printf("treeDeleteKey: Error, Key mismatch %u != %u\n", keyAtIdx, key);
+        free(cursor);
+        return;
+    }
+    printf("treeDeleteKey: Deleting key %u\n", key);
     leafNodeDelete(cursor);
 
     if (*leafNodeNumCells(node) < LEAF_NODE_MIN_CELLS) {
         balanceTreeAfterDeletion(cursor);
     }
+
+    free(cursor);
 }
 
 void leafNodeDelete(Cursor* cursor) {
     void* node = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t numCells = *leafNodeNumCells(node);
 
-    if (cursor->cellNum >= numCells) return;
+    if (cursor->cellNum >= numCells) {
+        printf("leafNodeDelete: Error, Cell number %u out of bounds (%u)\n", cursor->cellNum, numCells);
+        return;
+    }
+    printf("leafNodeDelete: Deleting cell number %u from node %u\n", cursor->cellNum, cursor->pageNum);
 
     for (uint32_t i = cursor->cellNum; i < numCells - 1; ++i) {
         memcpy(leafNodeCell(node, i), leafNodeCell(node, i + 1), LEAF_NODE_CELL_SIZE);
     }
 
     --(*leafNodeNumCells(node));
-
+    printf("leafNodeDelete: Decreased numCells to %u\n", *leafNodeNumCells(node));
 }
+
 
 void balanceTreeAfterDeletion(Cursor* cursor) {
     void* node = getPage(cursor->table->pager, cursor->pageNum);
@@ -39,6 +67,9 @@ void balanceTreeAfterDeletion(Cursor* cursor) {
     void* parent = getPage(cursor->table->pager, parentPageNum);
     uint32_t leftSiblingPageNum = getSiblingPageNum(cursor, SIBLING_LEFT);
     uint32_t rightSiblingPageNum = getSiblingPageNum(cursor, SIBLING_RIGHT);
+
+    printf("balanceTreeAfterDeletion: parentPageNum = %u, leftSiblingPageNum = %u, rightSiblingPageNum = %u\n",
+           parentPageNum, leftSiblingPageNum, rightSiblingPageNum);
 
     if (leftSiblingPageNum != INVALID_PAGE_NUM) {
         void* leftSibling = getPage(cursor->table->pager, leftSiblingPageNum);
@@ -73,6 +104,8 @@ uint32_t getSiblingPageNum(Cursor* cursor, SiblingSide side) {
 
     uint32_t idxInParent = getIdxInParent(parent, cursor->pageNum);
     
+    printf("getSiblingPageNum: parentPageNum = %u, idxInParent = %u, side = %d\n", parentPageNum, idxInParent, side);
+
     if (side == SIBLING_LEFT) {
         if (idxInParent == 0) {
             return INVALID_PAGE_NUM;
@@ -108,6 +141,8 @@ void rotateKeysFromLeft(Cursor* cursor, void* leftSibling) {
     void* node = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t leftNumCells = *leafNodeNumCells(node);
 
+    printf("rotateKeysFromLeft: Rotating keys from left sibling, leftNumCells = %u\n", leftNumCells);
+
     // move keys to the right in a node
     for (uint32_t i = *leafNodeNumCells(node); i > 0; --i) {
         memcpy(leafNodeCell(node, i), leafNodeCell(node, i - 1), LEAF_NODE_CELL_SIZE);
@@ -129,6 +164,8 @@ void rotateKeysFromLeft(Cursor* cursor, void* leftSibling) {
 void rotateKeysFromRight(Cursor* cursor, void* rightSibling) {
     void* node = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t rightNumCells = *leafNodeNumCells(rightSibling);
+
+    printf("rotateKeysFromRight: Rotating keys from right sibling, rightNumCells = %u\n", rightNumCells);
 
     // copy first key from the left parent to the current node
     memcpy(leafNodeCell(node, *leafNodeNumCells(node)), leafNodeCell(rightSibling, 0), LEAF_NODE_CELL_SIZE);
@@ -154,6 +191,9 @@ void leafNodeMerge(Table* table, uint32_t leftPageNum, uint32_t rightPageNum) {
 
     uint32_t leftNumCells = *leafNodeNumCells(leftNode);
     uint32_t rightNumCells = *leafNodeNumCells(rightNode);
+
+    printf("leafNodeMerge: Merging nodes, leftPageNum = %u, rightPageNum = %u\n", leftPageNum, rightPageNum);
+    printf("leafNodeMerge: leftNumCells = %u, rightNumCells = %u\n", leftNumCells, rightNumCells);
 
     // move all keys from right node to the left node
     for (uint32_t i = 0; i < rightNumCells; ++i) {
