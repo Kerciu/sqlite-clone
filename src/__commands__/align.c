@@ -4,11 +4,11 @@ StatementStatus constructAlign(InputBuffer* buffer, Statement* statement) {
     char* command = strtok(buffer->buffer, " ");
     char* prompt = strtok(NULL, "\n");
 
+    statement->type = STATEMENT_ALIGN;
     if (prompt == NULL) {
         statement->operationBounds.startIdx = 0;
         statement->operationBounds.endIdx = INT_MAX;
         statement->operationBounds.type = OPERATION_EVERY_ELEMENT;
-        statement->type = STATEMENT_ALIGN;
         return CONSTRUCTION_SUCCESS;
     }
 
@@ -16,9 +16,6 @@ StatementStatus constructAlign(InputBuffer* buffer, Statement* statement) {
 }
 
 ExecuteStatus executeAlign(Statement* statement, Table* table) {
-    void* node = getPage(table->pager, table->rootPageNum);
-    uint32_t numCells = *leafNodeNumCells(node);
-    
     uint32_t start = statement->operationBounds.startIdx;
     uint32_t end = statement->operationBounds.endIdx;
 
@@ -30,6 +27,8 @@ ExecuteStatus executeAlign(Statement* statement, Table* table) {
 
     Row row;
     Cursor* cursor = tableFind(table, start);
+    void* node = getPage(cursor->table->pager, cursor->pageNum);
+    uint32_t numCells = *leafNodeNumCells(node);
 
     if (cursor->cellNum < numCells) {
         for (uint32_t i = start; i <= end || !cursor->endOfTable; ++i) {

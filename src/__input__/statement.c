@@ -53,6 +53,11 @@ SpecialCommandStatus executeSpecialCommand(InputBuffer* buffer, Table* table) {
         return SPECIAL_EXEC_SUCCESS;
     }
 
+    else if (strcmp(buffer->buffer, ".minid") == 0) {
+        printf("Table min ID: %d\n", getTableMinID(table));
+        return SPECIAL_EXEC_SUCCESS;
+    }
+
     else return SPECIAL_EXEC_FAILURE;
 }
 

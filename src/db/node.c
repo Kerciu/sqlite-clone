@@ -139,7 +139,6 @@ void leafNodeSplitAndInsert(Cursor* cursor, uint32_t key, Row* value) {
     /* Create a new node and move half the cells over, insert the new value
     in one of two nodes, then update parent (or create new parent)
     */
-    printf("Splitting leaf node...\n");
     void* oldNode = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t oldMax = getNodeMaxKey(cursor->table->pager ,oldNode);
     uint32_t newPageNum = getUnusedPageNum(cursor->table->pager);
@@ -209,7 +208,6 @@ void updateInternalNodeKey(void* node, uint32_t oldKey, uint32_t newKey) {
 }
 
 void internalNodeSplitAndInsert(Table* table, uint32_t parentPageNum, uint32_t childPageNum) {
-    printf("Splitting internal node...\n");
     uint32_t oldPageNum = parentPageNum;
     void* oldNode = getPage(table->pager, parentPageNum);
     uint32_t oldMax = getNodeMaxKey(table->pager, oldNode);

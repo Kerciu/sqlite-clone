@@ -2,6 +2,7 @@
 
 StatementStatus constructDelete(InputBuffer* buffer, Statement* statement) {
     Operation delete = {0};
+    statement->type = STATEMENT_DELETE;
     statement->operationBounds = delete;
     char* command = strtok(buffer->buffer, " ");
     char* prompt = strtok(NULL, "\n");
@@ -25,10 +26,11 @@ ExecuteStatus executeDelete(Statement* statement, Table* table) {
         uint32_t keyToDelete = rowToDelete->id;
         Cursor* cursor = tableFind(table, keyToDelete);
         if (cursor == NULL) {
+            fprintf(stderr, "Cursor did not found key %d in table\n", keyToDelete);
             return EXECUTE_FAILURE;
         }
 
-        node = getPage(cursor->table->pager, cursor->pageNum);
+        node = getPage(table->pager, cursor->pageNum);
         numCells = *leafNodeNumCells(node);
 
         if (cursor->cellNum < numCells) {
@@ -36,40 +38,46 @@ ExecuteStatus executeDelete(Statement* statement, Table* table) {
 
             if (keyAtIdx == keyToDelete) {
                 treeDeleteKey(table, keyToDelete);
+                printf("Deleting key %d\n", keyToDelete);
                 free(cursor);
                 return EXECUTE_SUCCESS;
             } else {
                 return EXECUTE_NO_ROW_FOUND;
             }
         } else {
+            printf("Cursor->cellNum: %d >= numCells: %d\n", cursor->cellNum, numCells);
             return EXECUTE_FAILURE;
         }
     }  else {
-        uint32_t* startPtr = &(statement->operationBounds.startIdx);
-        *startPtr = (*startPtr >= getTableMinID(table) ? *startPtr : getTableMinID(table));
-        Cursor* startCursor = tableFind(table, *startPtr);
+        uint32_t start = statement->operationBounds.startIdx;
+        start = (start >= getTableMinID(table) ? start : getTableMinID(table));
+        printf("Start ID: %d\n", start);
+        Cursor* cursor = tableFind(table, start);
 
-        uint32_t* endPtr = &(statement->operationBounds.endIdx);
-        *endPtr = (*endPtr <= getTableMaxID(table) ? *endPtr : getTableMaxID(table));
-        Cursor* endCursor = tableFind(table, *endPtr);
+        uint32_t end = statement->operationBounds.endIdx;
+        end = (end <= getTableMaxID(table) ? end : getTableMaxID(table));
+        printf("End ID: %d\n", end);
 
-        uint32_t iter = *(startPtr);
-        while (cursorValue(startCursor) != cursorValue(endCursor) || iter != *endPtr) {
-            node = getPage(startCursor->table->pager, startCursor->pageNum);
+        if (cursor == NULL) return EXECUTE_FAILURE;
+
+        Row row;
+        for (uint32_t i = start; i <= end; ++i) {
+            cursor = tableFind(table, i);
+            deserializeRow(cursorValue(cursor), &row);
+            if (cursor == NULL || row.id != i) continue;
+
+            node = getPage(table->pager, cursor->pageNum);
             numCells = *leafNodeNumCells(node);
 
-            uint32_t keyAtIdx = *leafNodeKey(node, startCursor->cellNum);
-            printf("keyAtIdx: %d\nstartPtr: %d\nendPtr: %d\n", keyAtIdx, iter, *endPtr);
-
-            cursorAdvance(startCursor);
-            if (keyAtIdx == iter) {
-                treeDeleteKey(table, keyAtIdx);
+            if (cursor->cellNum < numCells) {
+                treeDeleteKey(table, i);
             }
-            ++iter;
         }
 
-        free(startCursor);
-        free(endCursor);
+        free(cursor);
+        return EXECUTE_SUCCESS;
+
+        free(cursor);
         return EXECUTE_SUCCESS;
     }
 }

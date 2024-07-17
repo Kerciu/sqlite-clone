@@ -38,7 +38,7 @@ ExecuteStatus executeInsert(Statement* statement, Table* table) {
     uint32_t keyToInsert = rowToInsert->id;
     Cursor* cursor = tableFind(table, keyToInsert);
 
-    void* node = getPage(cursor->table->pager, cursor->pageNum);
+    void* node = getPage(table->pager, cursor->pageNum);
     uint32_t numCells = (*leafNodeNumCells(node));
     
     if (cursor->cellNum < numCells) {

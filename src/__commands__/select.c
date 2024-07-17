@@ -16,13 +16,6 @@ StatementStatus constructSelect(InputBuffer* buffer, Statement* statement) {
 }
 
 ExecuteStatus executeSelect(Statement* statement, Table* table) {
-    void* node = getPage(table->pager, table->rootPageNum);
-    uint32_t numCells = *leafNodeNumCells(node);
-
-    if (numCells == 0) {
-        return EXECUTE_SUCCESS_NO_RECORDS;
-    }
-
     Cursor* cursor = tableStart(table);
 
     Row row;
@@ -32,11 +25,11 @@ ExecuteStatus executeSelect(Statement* statement, Table* table) {
         deserializeRow(cursorValue(cursor), &row);
         if (row.id >= start && row.id <= end) {
             displayRow(&row);
+            printf("Cellnum: %d\n", cursor->cellNum);
         }
         cursorAdvance(cursor);
     }
 
     free(cursor);
-
     return EXECUTE_SUCCESS;
 }
