@@ -1,4 +1,4 @@
-#include "../__input__/statement.h"
+#include "../input/statement/statement.h"
 
 StatementStatus constructAlign(InputBuffer* buffer, Statement* statement) {
     char* command = strtok(buffer->buffer, " ");

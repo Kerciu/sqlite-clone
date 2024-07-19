@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "__input__/input.h"
-#include "__input__/statement.h"
-#include "db/database.h"
+#include "input/buffer/input_buffer.h"
+#include "input/statement/statement.h"
+#include "db/database/database.h"
 
 void printUsage(const char* programName) {
     fprintf(stderr, "Usage: %s <file-name>\n", programName);

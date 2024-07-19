@@ -1,4 +1,4 @@
-#include "../__input__/statement.h"
+#include "../input/statement/statement.h"
 
 void printCommandMan(char* commandName) {
     printf("Manual:\n");

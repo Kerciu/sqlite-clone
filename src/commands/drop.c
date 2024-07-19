@@ -1,4 +1,4 @@
-#include "../__input__/statement.h"
+#include "../input/statement/statement.h"
 
 StatementStatus constructDrop(InputBuffer* buffer, Statement* statement) {
     statement->type = STATEMENT_DROP;

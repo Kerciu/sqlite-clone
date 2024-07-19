@@ -5,8 +5,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
-#include "input.h"
-#include "../db/database.h"
+#include "../buffer/input_buffer.h"
+#include "../../db/database/database.h"
 
 typedef enum {
     OPERATION_IN_BOUNDS, OPERATION_EVERY_ELEMENT, OPERATION_SINGLE_ELEMENT

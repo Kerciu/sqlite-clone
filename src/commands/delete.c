@@ -1,4 +1,4 @@
-#include "../__input__/statement.h"
+#include "../input/statement/statement.h"
 
 StatementStatus constructDelete(InputBuffer* buffer, Statement* statement) {
     Operation delete = {0};

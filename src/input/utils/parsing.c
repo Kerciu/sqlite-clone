@@ -1,4 +1,4 @@
-#include "statement.h"
+#include "../statement/statement.h"
 
 bool isNumber(char* prompt) {
     for (uint32_t i = 0; i< strlen(prompt); ++i) {

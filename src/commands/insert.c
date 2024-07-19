@@ -1,4 +1,4 @@
-#include "../__input__/statement.h"
+#include "../input/statement/statement.h"
 
 StatementStatus constructInsert(InputBuffer* buffer, Statement* statement) {
     // int args = sscanf(buffer->buffer, "insert %d %31s %255s", &(statement->rowToInsert.id),

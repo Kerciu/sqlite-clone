@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <limits.h>
-#include "types.h"
-#include "database.h"
+#include "../utils/types.h"
+#include "../database/database.h"
 
 #define INVALID_PAGE_NUM UINT32_MAX
 #define INVALID_INDEX -1

@@ -11,8 +11,8 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "types.h"
-#include "node.h"
+#include "../utils/types.h"
+#include "../tree/node.h"
 
 extern const uint32_t ID_SIZE;
 extern const uint32_t USERNAME_SIZE;
@@ -72,6 +72,7 @@ void serializeRow(Row* source, void* destination);
 void deserializeRow(void* source, Row* destination);
 void* cursorValue(Cursor* cursor);
 void cursorAdvance(Cursor* cursor);
+bool cursorKeyAcquired(Cursor* cursor, uint32_t key);
 
 Table* openDataBase(const char* fileHandle);
 void closeDataBase(Table* table);
