@@ -4,15 +4,7 @@ StatementStatus constructSelect(InputBuffer* buffer, Statement* statement) {
     char* command = strtok(buffer->buffer, " ");
     char* prompt = strtok(NULL, "\n");
 
-    if (prompt == NULL) {
-        statement->operationBounds.startIdx = 0;
-        statement->operationBounds.endIdx = INT_MAX;
-        statement->operationBounds.type = OPERATION_EVERY_ELEMENT;
-        statement->type = STATEMENT_SELECT;
-        return CONSTRUCTION_SUCCESS;
-    }
-
-    return checkIfFromToCommand(statement, STATEMENT_SELECT, prompt);
+    return (prompt != NULL) ? checkCommandRange(statement, STATEMENT_SELECT, prompt) : CONSTRUCTION_SYNTAX_ERROR;
 }
 
 ExecuteStatus executeSelect(Statement* statement, Table* table) {
