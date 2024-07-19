@@ -45,18 +45,15 @@ ExecuteStatus executeDelete(Statement* statement, Table* table) {
                 return EXECUTE_NO_ROW_FOUND;
             }
         } else {
-            printf("Cursor->cellNum: %d >= numCells: %d\n", cursor->cellNum, numCells);
             return EXECUTE_FAILURE;
         }
     }  else {
         uint32_t start = statement->operationBounds.startIdx;
         start = (start >= getTableMinID(table) ? start : getTableMinID(table));
-        printf("Start ID: %d\n", start);
         Cursor* cursor = tableFind(table, start);
 
         uint32_t end = statement->operationBounds.endIdx;
         end = (end <= getTableMaxID(table) ? end : getTableMaxID(table));
-        printf("End ID: %d\n", end);
 
         if (cursor == NULL) return EXECUTE_FAILURE;
 
@@ -73,9 +70,6 @@ ExecuteStatus executeDelete(Statement* statement, Table* table) {
                 treeDeleteKey(table, i);
             }
         }
-
-        free(cursor);
-        return EXECUTE_SUCCESS;
 
         free(cursor);
         return EXECUTE_SUCCESS;

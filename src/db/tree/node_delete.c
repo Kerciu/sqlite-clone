@@ -11,6 +11,8 @@ void treeDeleteKey(Table* table, uint32_t key) {
         return;
     }
 
+    if (!cursorKeyAcquired(cursor, key)) return;
+
     void* node = getPage(cursor->table->pager, cursor->pageNum);
     uint32_t numCells = *leafNodeNumCells(node);
 
