@@ -1,31 +1,37 @@
 #include "../input/statement/statement.h"
 
+ExecuteStatus clearDatabasContents(char* fileHandle) {
+    int fileDescriptor = open(fileHandle, O_WRONLY | O_TRUNC);
+    if (fileDescriptor == -1) {
+        fprintf(stderr, "Unable to open file for truncation: %d\n", errno);
+        return EXECUTE_FAILURE;
+    }
+
+    if (close(fileDescriptor) == -1) {
+        fprintf(stderr, "Error closing file after truncation: %d\n", errno);
+        return EXECUTE_FAILURE;
+    }
+}
+
 StatementStatus constructDrop(InputBuffer* buffer, Statement* statement) {
     statement->type = STATEMENT_DROP;
     return CONSTRUCTION_SUCCESS;
 }
 
 ExecuteStatus executeDrop(Statement* statement, Table* table) {
-    void* node = getPage(table->pager, table->rootPageNum);
-    uint32_t numCells = *leafNodeNumCells(node);
-    if (numCells < 1) return EXECUTE_SUCCESS_NO_RECORDS;
+    clearDatabasContents(table->fileHandle);
+    table->rootPageNum = 0;
+    table->pager->numPages = 0;
 
-    uint32_t start = getTableMinID(table);
-    uint32_t end = getTableMaxID(table);
-    for (uint32_t i = start; i <= end; ++i) {
-        Cursor* cursor = tableFind(table, i);
-        if (cursor->cellNum < numCells) {
-            uint32_t keyAtIdx = *leafNodeKey(node, cursor->cellNum);
-
-            if (keyAtIdx == i) {
-                treeDeleteKey(table, i);
-            }
-            else continue;
-        }
-        else {
-            return EXECUTE_FAILURE;
-        }
+    Table* newTable = openDataBase(table->fileHandle);
+    if (newTable == NULL) {
+        fprintf(stderr, "Failed to reinitialize the database\n");
+        return EXECUTE_FAILURE;
     }
+
+    closeDataBase(table);
+    *table = *newTable;
+    free(newTable);
 
     return EXECUTE_SUCCESS;
 }
