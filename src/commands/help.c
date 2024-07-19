@@ -6,17 +6,13 @@ void printCommandMan(char* commandName) {
         printf("INSERT <id> <username> <email>\n");
         printf("Inserts a new row into the table.\n");
     } else if (strcmp(commandName, "SELECT") == 0) {
-        printf("SELECT\n");
-        printf("SELECT FROM <id>\n");
-        printf("SELECT TO <id>\n");
-        printf("SELECT FROM <id> TO <id>\n");
+        printf("SELECT *\n");
+        printf("SELECT LIMIT <id>\n");
+        printf("SELECT BETWEEN <id> AND <id>\n");
         printf("Selects all rows from the table if no arguments given or selects in specified bounds.\n");
     } else if (strcmp(commandName, "DELETE") == 0) {
         printf("DELETE <id>\n");
-        printf("DELETE FROM <id>\n");
-        printf("DELETE TO <id>\n");
-        printf("DELETE FROM <id> TO <id>\n");
-        printf("Deletes the row with the specified id or in specified bounds.\n");
+        printf("Deletes the row with the specified id.\n");
     } else if (strcmp(commandName, "UPDATE") == 0) {
         printf("UPDATE <id> <username> <email>\n");
         printf("Updates the row with the specified id.\n");
