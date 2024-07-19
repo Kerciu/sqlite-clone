@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -g -Wall
-TARGET = kacpersql
+TARGET = KacperSql
 
 SRC_DIRS = . src src/commands src/input/buffer src/input/statement src/input/utils src/db/tree src/db/database src/db/utils
 OBJ_DIR = obj
