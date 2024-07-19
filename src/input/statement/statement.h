@@ -29,7 +29,7 @@ typedef enum {
 } StatementStatus;
 
 typedef enum {
-    STATEMENT_INSERT, STATEMENT_SELECT, STATEMENT_UPDATE, STATEMENT_ALIGN,
+    STATEMENT_INSERT, STATEMENT_SELECT, STATEMENT_UPDATE,
     STATEMENT_DELETE, STATEMENT_DROP, STATEMENT_OPEN_TABLE,
     STATEMENT_HELP
 } StatementType;
@@ -49,7 +49,7 @@ typedef struct {
     StatementType type;
     Row rowToInsert;            // Only to use by insert statement
     Row rowToChange;            // Only to use by update or delete statement
-    Operation operationBounds;  // Only to use by align and delete statement
+    Operation operationBounds;  // Only to use by select statement
     char* workingFileName;      // Only to use by open and create statement
     char* commandManual;        // Only to use by help statement
 } Statement;
@@ -58,17 +58,18 @@ typedef struct {
 BoundStatus validateBound(char* bound);
 BoundStatus validateBounds(char* start, char* end);
 bool isNumber(char* prompt);
-StatementStatus parseFromCommand(Statement* statement, char* prompt, char* bound);
-StatementStatus parseToCommand(Statement* statement, char* prompt, char* bound);
-StatementStatus parseFromToCommand(Statement* statement, char* fromString);
-StatementStatus checkIfFromToCommand(Statement* statement, StatementType type, char* prompt);
+
+StatementStatus parseLimitCommand(Statement* statement, char* prompt, char* bound);
+StatementStatus parseBetweenCommand(Statement* statement, char* betweenString);
+StatementStatus parseStarCommand(Statement* statement);
+StatementStatus checkCommandRange(Statement* statement, StatementType type, char* prompt);
+
 SpecialCommandStatus executeSpecialCommand(InputBuffer* buffer, Table* table);
 StatementStatus constructStatement(InputBuffer* buffer, Statement* statement);
 StatementStatus constructInsert(InputBuffer* buffer, Statement* statement);
 StatementStatus constructSelect(InputBuffer* buffer, Statement* statement);
 StatementStatus constructDelete(InputBuffer* buffer, Statement* statement);
 StatementStatus constructUpdate(InputBuffer* buffer, Statement* statement);
-StatementStatus constructAlign(InputBuffer* buffer, Statement* statement);
 StatementStatus constructDrop(InputBuffer* buffer, Statement* statement);
 StatementStatus constructOpenTable(InputBuffer* buffer, Statement* statement);
 StatementStatus constructHelp(InputBuffer* buffer, Statement* statement);
@@ -77,7 +78,6 @@ ExecuteStatus executeInsert(Statement* statement, Table* table);
 ExecuteStatus executeSelect(Statement* statement, Table* table);
 ExecuteStatus executeDelete(Statement* statement, Table* table);
 ExecuteStatus executeUpdate(Statement* statement, Table* table);
-ExecuteStatus executeAlign(Statement* statement, Table* table);
 ExecuteStatus executeDrop(Statement* statement, Table* table);
 ExecuteStatus executeOpenTable(Statement* statement, Table** table);
 ExecuteStatus executeHelp(Statement* statement);

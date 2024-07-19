@@ -57,11 +57,6 @@ StatementStatus constructStatement(InputBuffer* buffer, Statement* statement) {
         return constructDelete(buffer, statement);
     }
 
-    if (strncmp(buffer->buffer, "ALIGN", 4) == 0) {
-        
-        return constructAlign(buffer, statement);
-    }
-
     if (strncmp(buffer->buffer, "DROP", 4) == 0) {
         return constructDrop(buffer, statement);
     }
@@ -91,10 +86,7 @@ ExecuteStatus executeStatement(Statement* statement, Table* table) {
         
         case STATEMENT_DELETE:
             return executeDelete(statement, table);
-        
-        case STATEMENT_ALIGN:
-            return executeAlign(statement, table);
-        
+
         case STATEMENT_DROP:
             return executeDrop(statement, table);
 

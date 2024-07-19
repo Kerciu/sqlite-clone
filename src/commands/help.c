@@ -26,12 +26,6 @@ void printCommandMan(char* commandName) {
     } else if (strcmp(commandName, "DROP") == 0) {
         printf("DROP *<file-name>\t* - optional\n");
         printf("Deletes the table with specified file name or clears current working one\n");
-    } else if (strcmp(commandName, "ALIGN") == 0) {
-        printf("ALIGN\n");
-        printf("ALIGN FROM <id>\n");
-        printf("ALIGN TO <id>\n");
-        printf("ALIGN FROM <id> TO <id>\n");
-        printf("Align ids in whole table if no arguments given or align in specified bounds.\n");
     } else {
         printf("Unrecognized command: %s\n", commandName);
     }
@@ -45,7 +39,6 @@ void printCommands() {
     printf(" - UPDATE\n");
     printf(" - OPEN TABLE\n");
     printf(" - DROP\n");
-    printf(" - ALIGN\n");
     printf("Use HELP <command> for more details on a specific command.\n");
 }
 
