@@ -84,7 +84,7 @@ Displays details for a specific command.
 2. **Inserting a Record:**
 
    ```sql
-   INSERT 1 JohnDoe johndoe@example.com
+   INSERT 1 Kacper kerciuuu@gmail.com
    ```
 
 3. **Selecting Records:**
@@ -96,7 +96,7 @@ Displays details for a specific command.
 4. **Updating a Record:**
 
    ```sql
-   UPDATE 1 JaneDoe janedoe@example.com
+   UPDATE 1 Kacper kerciuuu@gmail.com
    ```
 
 5. **Deleting a Record:**
@@ -121,4 +121,4 @@ If you have any questions, feedback, or suggestions, feel free to reach out thro
 - **Support**: For technical support, please email [kerciuuu@gmail.com](mailto:kerciuuu@gmail.com)
 
 For issues, please open a [GitHub Issue](https://github.com/Kerciu/sqlite-clone/issues).
-```
+
