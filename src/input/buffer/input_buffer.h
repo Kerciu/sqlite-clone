@@ -19,4 +19,7 @@ void destroyInputBuffer(InputBuffer* buf);
 void printPrompt(void);
 void fetchCommand(InputBuffer* buf);
 
+void printUsage(const char* programName);
+void printGuidingMsg(void);
+
 #endif // INPUT_BUFFER

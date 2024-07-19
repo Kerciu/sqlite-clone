@@ -82,4 +82,6 @@ ExecuteStatus executeDrop(Statement* statement, Table* table);
 ExecuteStatus executeOpenTable(Statement* statement, Table** table);
 ExecuteStatus executeHelp(Statement* statement);
 
+void chooseWorkingDB(InputBuffer* buffer, Statement* statement, Table** table);
+
 #endif
