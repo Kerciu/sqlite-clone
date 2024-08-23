@@ -17,7 +17,6 @@ ExecuteStatus executeSelect(Statement* statement, Table* table) {
         deserializeRow(cursorValue(cursor), &row);
         if (row.id >= start && row.id <= end) {
             displayRow(&row);
-            printf("Cellnum: %d\n", cursor->cellNum);
         }
         cursorAdvance(cursor);
     }
